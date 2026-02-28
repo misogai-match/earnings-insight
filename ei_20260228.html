@@ -1,0 +1,281 @@
+<!--
+  EI_dashboard v5 — 2026/02/28
+  v1: 初版（3タブ）
+  v2: #番号削除、Forward & Reaction追加（タブ4）
+  v3: チャートデータキー修正、Reactionラベル改行削除
+  v4: Chart.js X軸ラベル修正（インデックス番号→日本語）
+  v5: タブ4/5分離（Forward Estimates / Market Reaction）
+      全チャートX軸を日本語フル表記に統一
+      バージョン管理導入
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earnings Insight 比較ダッシュボード v5</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f8f9fb;--card:#fff;--border:#e8eaed;--text:#1a1a2e;--text2:#5f6368;--text3:#9aa0a6;--accent:#1a73e8;--accent-light:#e8f0fe;--up:#137333;--down:#c5221f;--neutral:#9aa0a6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Helvetica Neue','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text)}
+.container{max-width:1080px;margin:0 auto;padding:24px}
+.header{margin-bottom:28px}.header h1{font-size:22px;font-weight:700;letter-spacing:-0.5px}.header p{font-size:12px;color:var(--text3);margin-top:4px}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto}
+.tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--text3);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--text2)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.card-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.blue::before{background:linear-gradient(90deg,#4285f4,#1a73e8)}
+.kpi.green::before{background:linear-gradient(90deg,#34a853,#137333)}
+.kpi.violet::before{background:linear-gradient(90deg,#a142f4,#7627bb)}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi-value{font-size:28px;font-weight:700;margin:6px 0 2px}.kpi-delta{font-size:12px;font-weight:600;color:var(--up)}.kpi-prev{font-size:11px;color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 12px;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border);text-align:center;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+thead th:first-child,thead th:last-child{text-align:left}
+tbody td{padding:10px 12px;border-bottom:1px solid #f3f4f6;text-align:center}
+tbody td:first-child,tbody td:last-child{text-align:left}
+tbody tr:hover{background:#fafbfc}
+tr.hl{background:var(--accent-light)!important}tr.hl td{font-weight:600}
+td.up{color:var(--up);font-weight:600}td.dn{color:var(--down);font-weight:600}td.fl{color:var(--neutral)}
+tr.sb td{border-top:2px solid var(--border)}
+.cbox{background:#fafbfc;border-radius:10px;padding:16px;margin-top:16px}
+.cbox h3{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px}
+.cwrap{position:relative;width:100%}
+.cnote{font-size:11px;color:var(--text3);text-align:center;margin-top:10px}
+.footer{font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:12px;margin-top:24px}
+@media(max-width:640px){.kpi-row{grid-template-columns:1fr}.container{padding:16px}table{font-size:12px}thead th,tbody td{padding:8px 6px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Earnings Insight 比較ダッシュボード</h1>
+    <p>FactSet Earnings Insight — 2026/2/13 vs 2026/2/27（S&P500 Q4 2025）　<span style="color:#ccc">v5</span></p>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab(0)">📊 1 全体指標</button>
+    <button class="tab" onclick="showTab(1)">📈 2 EPS Growth</button>
+    <button class="tab" onclick="showTab(2)">💰 3 Rev Growth</button>
+    <button class="tab" onclick="showTab(3)">🔮 4 Forward Estimates</button>
+    <button class="tab" onclick="showTab(4)">⚡ 5 Market Reaction</button>
+  </div>
+
+  <!-- Tab 0: 全体指標 -->
+  <div class="panel active" id="p0">
+    <div class="kpi-row">
+      <div class="kpi blue"><div class="kpi-label">EPS Growth</div><div class="kpi-value">14.2%</div><div class="kpi-delta">+1.0pt</div><div class="kpi-prev">← 13.2%</div></div>
+      <div class="kpi green"><div class="kpi-label">Revenue Growth</div><div class="kpi-value">9.4%</div><div class="kpi-delta">+0.4pt</div><div class="kpi-prev">← 9.0%</div></div>
+      <div class="kpi violet"><div class="kpi-label">Net Margin</div><div class="kpi-value">13.3%</div><div class="kpi-delta">+0.1pt</div><div class="kpi-prev">← 13.2%</div></div>
+    </div>
+    <div class="card"><div class="card-title">1 全体指標比較</div>
+      <table><thead><tr><th style="text-align:left">指標</th><th>2026/2/13</th><th>2026/2/27</th><th>変化</th><th style="text-align:left">要点</th></tr></thead>
+      <tbody>
+        <tr><td>EPS成長率（YoY, Q4）</td><td>13.2%</td><td>14.2%</td><td class="up">+1.0pt</td><td>IT主導で上振れ加速</td></tr>
+        <tr><td>売上成長率（YoY, Q4）</td><td>9.0%</td><td>9.4%</td><td class="up">+0.4pt</td><td>3年ぶり高水準を更新</td></tr>
+        <tr><td>EPSサプライズ率</td><td>74%</td><td>73%</td><td class="dn">-1pt</td><td>報告進捗96%で微低下</td></tr>
+        <tr><td>売上サプライズ率</td><td>73%</td><td>73%</td><td class="fl">→</td><td>高水準維持</td></tr>
+        <tr><td>Net Profit Margin</td><td>13.2%</td><td>13.3%</td><td class="up">+0.1pt</td><td>2009年以降の最高水準更新</td></tr>
+        <tr><td>Forward 12M PER</td><td>21.5</td><td>21.6</td><td class="up">+0.1x</td><td>5Y avg 20.0 / 10Y avg 18.8</td></tr>
+        <tr><td>Trailing 12M PER</td><td>28.0</td><td>27.8</td><td class="dn">-0.2x</td><td>低下（EPS実績の上振れ効果）</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- Tab 1: EPS Growth -->
+  <div class="panel" id="p1">
+    <div class="card"><div class="card-title">2 セクター別 + S&P500 Earnings Growth（YoY, Q4）</div>
+      <table><thead><tr><th style="text-align:left">セクター</th><th>2026/2/13</th><th>2026/2/27</th><th>変化</th><th style="text-align:left">要点</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>S&P500</td><td>13.2%</td><td>14.2%</td><td class="up">+1.0pt</td><td>IT主導で上振れ加速</td></tr>
+        <tr><td>情報技術</td><td>30.7%</td><td>33.4%</td><td class="up">+2.7pt</td><td>NVIDIA・Salesforce押上げ</td></tr>
+        <tr><td>資本財・サービス</td><td>26.0%</td><td>26.7%</td><td class="up">+0.7pt</td><td>Boeing効果継続</td></tr>
+        <tr><td>コミュニケーション・サービス</td><td>13.6%</td><td>13.1%</td><td class="dn">-0.5pt</td><td>小幅調整</td></tr>
+        <tr><td>素材</td><td>7.6%</td><td>11.7%</td><td class="up">+4.1pt</td><td>Newmont等金属・鉱業牽引</td></tr>
+        <tr><td>金融</td><td>9.2%</td><td>9.3%</td><td class="up">+0.1pt</td><td>横ばい</td></tr>
+        <tr><td>不動産</td><td>2.5%</td><td>3.1%</td><td class="up">+0.6pt</td><td>改善</td></tr>
+        <tr><td>生活必需品</td><td>1.8%</td><td>2.6%</td><td class="up">+0.8pt</td><td>改善</td></tr>
+        <tr><td>公益事業</td><td>4.4%</td><td>1.4%</td><td class="dn">-3.0pt</td><td>Vistra等で大幅悪化</td></tr>
+        <tr><td>エネルギー</td><td>-0.1%</td><td>1.2%</td><td class="up">+1.3pt</td><td>プラス転換</td></tr>
+        <tr><td>ヘルスケア</td><td>0.3%</td><td>0.4%</td><td class="up">+0.1pt</td><td>横ばい</td></tr>
+        <tr><td>一般消費財・サービス</td><td>-1.0%</td><td>0.4%</td><td class="up">+1.4pt</td><td>プラス転換（全セクター増益）</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><div class="cbox"><h3>セクター別 EPS Growth 比較チャート</h3><div class="cwrap" style="height:420px"><canvas id="c1"></canvas></div></div></div>
+  </div>
+
+  <!-- Tab 2: Revenue Growth -->
+  <div class="panel" id="p2">
+    <div class="card"><div class="card-title">3 セクター別 + S&P500 Revenue Growth（YoY, Q4）</div>
+      <table><thead><tr><th style="text-align:left">セクター</th><th>2026/2/13</th><th>2026/2/27</th><th>変化</th><th style="text-align:left">要点</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>S&P500</td><td>9.0%</td><td>9.4%</td><td class="up">+0.4pt</td><td>3年ぶり高水準更新</td></tr>
+        <tr><td>情報技術</td><td>20.6%</td><td>21.6%</td><td class="up">+1.0pt</td><td>NVIDIA・Dell追加寄与</td></tr>
+        <tr><td>コミュニケーション・サービス</td><td>12.2%</td><td>12.5%</td><td class="up">+0.3pt</td><td>高成長維持</td></tr>
+        <tr><td>ヘルスケア</td><td>10.3%</td><td>10.4%</td><td class="up">+0.1pt</td><td>横ばい</td></tr>
+        <tr><td>公益事業</td><td>4.6%</td><td>10.2%</td><td class="up">+5.6pt</td><td>大幅上振れ</td></tr>
+        <tr><td>金融</td><td>8.8%</td><td>8.8%</td><td class="fl">→</td><td>横ばい</td></tr>
+        <tr><td>不動産</td><td>8.1%</td><td>8.6%</td><td class="up">+0.5pt</td><td>改善</td></tr>
+        <tr><td>資本財・サービス</td><td>7.8%</td><td>8.1%</td><td class="up">+0.3pt</td><td>横ばい</td></tr>
+        <tr><td>一般消費財・サービス</td><td>5.7%</td><td>5.9%</td><td class="up">+0.2pt</td><td>横ばい</td></tr>
+        <tr><td>生活必需品</td><td>5.2%</td><td>5.3%</td><td class="up">+0.1pt</td><td>横ばい</td></tr>
+        <tr><td>素材</td><td>3.0%</td><td>3.6%</td><td class="up">+0.6pt</td><td>改善</td></tr>
+        <tr><td>エネルギー</td><td>-0.3%</td><td>-0.5%</td><td class="dn">-0.2pt</td><td>減収幅拡大</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><div class="cbox"><h3>セクター別 Revenue Growth 比較チャート</h3><div class="cwrap" style="height:420px"><canvas id="c2"></canvas></div></div></div>
+  </div>
+
+  <!-- Tab 3: Forward Estimates -->
+  <div class="panel" id="p3">
+    <div class="card"><div class="card-title">4 Forward Estimates（2026年 四半期別予想推移）</div>
+      <table><thead><tr><th style="text-align:left">指標</th><th>2026/2/13</th><th>2026/2/27</th><th>変化</th><th style="text-align:left">要点</th></tr></thead>
+      <tbody>
+        <tr><td>Q1 2026 EPS Growth</td><td>11.1%</td><td>11.4%</td><td class="up">+0.3pt</td><td>小幅上方修正</td></tr>
+        <tr><td>Q2 2026 EPS Growth</td><td>14.9%</td><td>15.4%</td><td class="up">+0.5pt</td><td>上方修正</td></tr>
+        <tr><td>Q3 2026 EPS Growth</td><td>15.6%</td><td>16.2%</td><td class="up">+0.6pt</td><td>上方修正</td></tr>
+        <tr><td>Q4 2026 EPS Growth</td><td>15.0%</td><td>15.0%</td><td class="fl">→</td><td>横ばい</td></tr>
+        <tr class="hl"><td>CY 2026 EPS Growth</td><td>14.4%</td><td>14.7%</td><td class="up">+0.3pt</td><td>通年でも上方修正</td></tr>
+        <tr class="sb"><td>Q1 2026 Rev Growth</td><td>8.7%</td><td>9.1%</td><td class="up">+0.4pt</td><td>上方修正</td></tr>
+        <tr class="hl"><td>CY 2026 Rev Growth</td><td>7.5%</td><td>7.7%</td><td class="up">+0.2pt</td><td>小幅上方修正</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><div class="cbox"><h3>2026年 四半期別 EPS / Revenue Growth 予想</h3><div class="cwrap" style="height:300px"><canvas id="c3"></canvas></div></div></div>
+  </div>
+
+  <!-- Tab 4: Market Reaction -->
+  <div class="panel" id="p4">
+    <div class="card"><div class="card-title">5 マーケットリアクション & バリュエーション</div>
+      <table><thead><tr><th style="text-align:left">指標</th><th>2026/2/13</th><th>2026/2/27</th><th>変化</th><th style="text-align:left">要点</th></tr></thead>
+      <tbody>
+        <tr><td>Positive Surprise → 株価</td><td>+0.9%</td><td>+1.2%</td><td class="up">+0.3pt</td><td>5Y avg +0.9%を上回る</td></tr>
+        <tr><td>Negative Surprise → 株価</td><td>-2.0%</td><td>-1.3%</td><td class="up">+0.7pt</td><td>罰則緩和（5Y avg -2.8%）</td></tr>
+        <tr><td>Q1ネガティブGuidance率</td><td>45%</td><td>46%</td><td class="up">+1pt</td><td>5Y avg 58%を大幅に下回る</td></tr>
+        <tr><td>S&P500終値</td><td>6,833</td><td>6,909</td><td class="up">+1.1%</td><td>2週間で上昇</td></tr>
+        <tr><td>TP Upside</td><td>20.8%</td><td>20.2%</td><td class="dn">-0.6pt</td><td>株価上昇でUpside縮小</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><div class="cbox"><h3>EPS Surprise → 株価反応（5Y avg比較）</h3><div class="cwrap" style="height:200px"><canvas id="c4"></canvas></div>
+      <div class="cnote">ネガティブサプライズへの罰則が5Y平均 -2.8% に対し -1.3% と大幅に緩和 → 市場のリスク許容度は高い状態</div>
+    </div></div>
+  </div>
+
+  <div class="footer">Source: FactSet Earnings Insight (Feb 13, 2026 / Feb 27, 2026)</div>
+</div>
+
+<script>
+/* ===== Chart data ===== */
+var EPS_L = ['S&P500','情報技術','資本財・サービス','コミュニケーション・サービス','素材','金融','不動産','生活必需品','公益事業','エネルギー','ヘルスケア','一般消費財・サービス'];
+var EPS_D1 = [13.2,30.7,26.0,13.6,7.6,9.2,2.5,1.8,4.4,-0.1,0.3,-1.0];
+var EPS_D2 = [14.2,33.4,26.7,13.1,11.7,9.3,3.1,2.6,1.4,1.2,0.4,0.4];
+
+var REV_L = ['S&P500','情報技術','コミュニケーション・サービス','ヘルスケア','公益事業','金融','不動産','資本財・サービス','一般消費財・サービス','生活必需品','素材','エネルギー'];
+var REV_D1 = [9.0,20.6,12.2,10.3,4.6,8.8,8.1,7.8,5.7,5.2,3.0,-0.3];
+var REV_D2 = [9.4,21.6,12.5,10.4,10.2,8.8,8.6,8.1,5.9,5.3,3.6,-0.5];
+
+var charts = {};
+
+function showTab(n) {
+  document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n)});
+  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n)});
+  requestAnimationFrame(function(){
+    if(n===1 && !charts.c1) charts.c1 = mkSector('c1', EPS_L, EPS_D1, EPS_D2, 'rgba(147,197,253,0.85)', 'rgba(37,99,235,0.9)');
+    if(n===2 && !charts.c2) charts.c2 = mkSector('c2', REV_L, REV_D1, REV_D2, 'rgba(134,239,172,0.85)', 'rgba(22,163,74,0.9)');
+    if(n===3 && !charts.c3) charts.c3 = mkFwd();
+    if(n===4 && !charts.c4) charts.c4 = mkReaction();
+    Object.values(charts).forEach(function(c){if(c)c.resize()});
+  });
+}
+
+function mkSector(id, labels, d1, d2, col1, col2) {
+  return new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: '2/13', data: d1, backgroundColor: col1, borderRadius: 4 },
+        { label: '2/27', data: d2, backgroundColor: col2, borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 16 } },
+        tooltip: { backgroundColor: '#fff', titleColor: '#333', bodyColor: '#555', borderColor: '#e0e0e0', borderWidth: 1, padding: 10,
+          callbacks: { label: function(ctx){ return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } }
+        }
+      },
+      scales: {
+        x: { type: 'category', grid: { display: false },
+          ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 45, autoSkip: false,
+            callback: function(value, index) { return labels[index]; }
+          }
+        },
+        y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 }, callback: function(v){ return v + '%'; } } }
+      }
+    }
+  });
+}
+
+function mkFwd() {
+  return new Chart(document.getElementById('c3'), {
+    type: 'bar',
+    data: {
+      labels: ['Q1','Q2','Q3','Q4'],
+      datasets: [
+        { label: '2/13 EPS', data: [11.1,14.9,15.6,15.0], backgroundColor: 'rgba(147,197,253,0.85)', borderRadius: 4 },
+        { label: '2/27 EPS', data: [11.4,15.4,16.2,15.0], backgroundColor: 'rgba(37,99,235,0.9)', borderRadius: 4 },
+        { label: '2/13 Rev', data: [8.7,7.9,7.3,7.4], backgroundColor: 'rgba(134,239,172,0.85)', borderRadius: 4 },
+        { label: '2/27 Rev', data: [9.1,8.3,7.6,7.5], backgroundColor: 'rgba(22,163,74,0.9)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 16 } },
+        tooltip: { backgroundColor: '#fff', titleColor: '#333', bodyColor: '#555', borderColor: '#e0e0e0', borderWidth: 1, padding: 10,
+          callbacks: { label: function(ctx){ return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 12 } } },
+        y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 }, callback: function(v){ return v + '%'; } } }
+      }
+    }
+  });
+}
+
+function mkReaction() {
+  return new Chart(document.getElementById('c4'), {
+    type: 'bar',
+    data: {
+      labels: ['Positive Surprise','Negative Surprise'],
+      datasets: [
+        { label: '5Y avg', data: [0.9,-2.8], backgroundColor: 'rgba(209,213,219,0.85)', borderRadius: 4 },
+        { label: '2/13', data: [0.9,-2.0], backgroundColor: 'rgba(147,197,253,0.85)', borderRadius: 4 },
+        { label: '2/27', data: [1.2,-1.3], backgroundColor: 'rgba(37,99,235,0.9)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: {
+        legend: { labels: { font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 16 } },
+        tooltip: { backgroundColor: '#fff', titleColor: '#333', bodyColor: '#555', borderColor: '#e0e0e0', borderWidth: 1, padding: 10,
+          callbacks: { label: function(ctx){ return ' ' + ctx.dataset.label + ': ' + ctx.parsed.x + '%'; } }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 }, callback: function(v){ return v + '%'; } } },
+        y: { grid: { display: false }, ticks: { font: { size: 12 } } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
