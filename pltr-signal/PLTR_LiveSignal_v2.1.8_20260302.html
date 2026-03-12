@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLTR LiveSignal v2.1.8</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:linear-gradient(170deg,#08080f 0%,#0c0c1a 50%,#08080f 100%);color:#d0d0e0;font-family:'DM Sans','Helvetica Neue',Arial,sans-serif;padding:28px 24px;-webkit-font-smoothing:antialiased}
+.m{font-family:'JetBrains Mono',monospace}
+.pill{display:inline-block;padding:3px 10px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:.5px}
+.flex{display:flex;flex-wrap:wrap}
+.card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px 18px}
+.mini{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:12px 14px;flex:1 1 100px;min-width:100px}
+.mini-t{font-size:12px;font-weight:600;color:#606078;letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px}
+.mini-v{font-size:21px;font-weight:800;font-family:'JetBrains Mono',monospace}
+.mini-s{font-size:12px;color:#505068;margin-top:2px}
+.sec-t{font-size:13px;font-weight:700;color:#606078;letter-spacing:1px;margin-bottom:10px}
+.bar-row{margin-bottom:8px}
+.bar-head{display:flex;justify-content:space-between;margin-bottom:3px}
+.bar-l{font-size:14px;color:#9090a8;font-weight:600}
+.bar-v{font-size:14px;color:#d0d0e0;font-family:'JetBrains Mono',monospace;font-weight:700}
+.bar-bg{height:7px;background:#1a1a2e;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.gauge-wrap{text-align:center}
+.gauge-label{font-size:13px;font-weight:700;color:#808098;letter-spacing:.8px;margin-top:2px}
+.gauge-sub{font-size:12px;color:#505068}
+</style>
+</head>
+<body>
+<div style="max-width:920px;margin:0 auto">
+
+<!-- Header -->
+<div class="flex" style="justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:10px">
+<div>
+<div class="flex" style="align-items:center;gap:10px">
+<span style="font-size:30px;font-weight:800;letter-spacing:-1px">PLTR</span>
+<span class="pill" style="color:#ff6d00;background:rgba(255,109,0,.12)">LIVE SIGNAL</span>
+<span class="pill" style="color:#808098;background:rgba(255,255,255,.06)">v2.1.8</span>
+</div>
+<div style="font-size:12px;color:#505068;margin-top:4px">Palantir Technologies · Earnings Scorecard v2</div>
+</div>
+<div style="text-align:right">
+<div class="m" style="font-size:28px;font-weight:800">$136.93</div>
+<div class="m" style="font-size:14px;color:#ef5350">-0.19%</div>
+<div style="font-size:11px;color:#404058">2026-03-02 09:00 EST</div>
+</div>
+</div>
+
+<!-- Signal + Valuation Top -->
+<div class="flex" style="gap:10px;margin-bottom:14px">
+<div class="card" style="flex:0 0 auto;text-align:center;min-width:90px">
+<div style="font-size:13px;font-weight:700;color:#606078;letter-spacing:1px">EARNINGS</div>
+<div class="m" style="font-size:42px;font-weight:800;color:#e0e0f0;line-height:1.1">T-64</div>
+<div style="font-size:12px;color:#505068">2026-05-05</div>
+</div>
+
+<div style="flex:1 1 240px;background:rgba(255,109,0,.03);border:1px solid rgba(255,109,0,.09);border-radius:12px;padding:16px 18px">
+<div style="font-size:13px;font-weight:700;color:#606078;letter-spacing:1px">PRE-EARNINGS SIGNAL (Tier1待ち)</div>
+<div class="flex" style="align-items:baseline;gap:10px;margin-top:6px">
+<span class="m" style="font-size:38px;font-weight:800;color:#ff6d00">54</span>
+<span style="font-size:14px;color:#606078">/100</span>
+<span style="font-size:21px;font-weight:800;color:#ff6d00">やや強気</span>
+<span style="font-size:14px;color:#606078">(LEAN BULL)</span>
+</div>
+<div style="font-size:13px;color:#707088;margin-top:4px">Tier1で1pt以上 → 強気確定</div>
+</div>
+
+<div style="flex:1 1 200px;background:rgba(120,144,156,.04);border:1px solid rgba(120,144,156,.12);border-radius:12px;padding:16px 18px">
+<div style="font-size:13px;font-weight:700;color:#606078;letter-spacing:1px">VALUATION ZONE</div>
+<div style="font-size:28px;font-weight:800;color:#78909c;margin-top:4px">適正</div>
+<div style="font-size:13px;color:#808098;margin-top:3px">Base理論株価 $147　(-6.8%)</div>
+<div class="flex" style="gap:6px;margin-top:6px">
+<span class="pill" style="color:#2979ff;background:rgba(41,121,255,.1)">Bear $85</span>
+<span class="pill" style="color:#e0e0f0;background:rgba(255,255,255,.08)">Base $147</span>
+<span class="pill" style="color:#ff6d00;background:rgba(255,109,0,.1)">Bull $263</span>
+</div>
+</div>
+</div>
+
+<!-- Gauges -->
+<div class="flex" style="gap:10px;margin-bottom:16px">
+<div style="flex:1 1 100px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px 10px">
+<div class="gauge-wrap">
+<div style="position:relative;width:130px;height:70px;margin:0 auto;overflow:hidden">
+<svg viewBox="0 0 120 64" width="130" height="70"><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#1a1a2e" stroke-width="7" stroke-linecap="round"/><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#66bb6a" stroke-width="7" stroke-linecap="round" stroke-dasharray="67.5 157"/></svg>
+<div class="m" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:26px;font-weight:800;color:#66bb6a">43</div>
+</div>
+<div class="gauge-label">F&G Index</div>
+<div class="gauge-sub">Fear → +2pt</div>
+</div>
+</div>
+<div style="flex:1 1 100px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px 10px">
+<div class="gauge-wrap">
+<div style="position:relative;width:130px;height:70px;margin:0 auto;overflow:hidden">
+<svg viewBox="0 0 120 64" width="130" height="70"><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#1a1a2e" stroke-width="7" stroke-linecap="round"/><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#78909c" stroke-width="7" stroke-linecap="round" stroke-dasharray="22.9 157"/></svg>
+<div class="m" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:26px;font-weight:800;color:#78909c">7</div>
+</div>
+<div class="gauge-label">QoQ Stock Δ</div>
+<div class="gauge-sub">-7.3% → 0pt</div>
+</div>
+</div>
+<div style="flex:1 1 100px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px 10px">
+<div class="gauge-wrap">
+<div style="position:relative;width:130px;height:70px;margin:0 auto;overflow:hidden">
+<svg viewBox="0 0 120 64" width="130" height="70"><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#1a1a2e" stroke-width="7" stroke-linecap="round"/><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#ff6d00" stroke-width="7" stroke-linecap="round" stroke-dasharray="91.3 157"/></svg>
+<div class="m" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:26px;font-weight:800;color:#ff6d00">41</div>
+</div>
+<div class="gauge-label">織込みCAGR</div>
+<div class="gauge-sub">vs ガイダンス61%</div>
+</div>
+</div>
+<div style="flex:1 1 100px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px 10px">
+<div class="gauge-wrap">
+<div style="position:relative;width:130px;height:70px;margin:0 auto;overflow:hidden">
+<svg viewBox="0 0 120 64" width="130" height="70"><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#1a1a2e" stroke-width="7" stroke-linecap="round"/><path d="M10 58 A50 50 0 0 1 110 58" fill="none" stroke="#ffab00" stroke-width="7" stroke-linecap="round" stroke-dasharray="38.5 157"/></svg>
+<div class="m" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:26px;font-weight:800;color:#ffab00">1.2</div>
+</div>
+<div class="gauge-label">FCF Yield</div>
+<div class="gauge-sub">FY26E</div>
+</div>
+</div>
+</div>
+
+<!-- Score + Valuation Detail -->
+<div class="flex" style="gap:12px;margin-bottom:16px">
+<div class="card" style="flex:1 1 300px">
+<div class="sec-t">SCORE BREAKDOWN</div>
+<div class="bar-row"><div class="bar-head"><span class="bar-l">Tier 1: サプライズ</span><span class="bar-v">? / 40</span></div><div class="bar-bg"><div class="bar-fill" style="width:0%;background:#404060"></div></div></div>
+<div style="font-size:12px;color:#505068;margin-bottom:8px;margin-top:-2px;padding-left:6px">← 決算待ち</div>
+<div class="bar-row"><div class="bar-head"><span class="bar-l">Tier 2: トレンド加速</span><span class="bar-v">30 / 35</span></div><div class="bar-bg"><div class="bar-fill" style="width:85.7%;background:#ff6d00"></div></div></div>
+<div class="bar-row"><div class="bar-head"><span class="bar-l">Tier 3: 構造品質</span><span class="bar-v">22 / 25</span></div><div class="bar-bg"><div class="bar-fill" style="width:88%;background:#ffab00"></div></div></div>
+<div class="bar-row"><div class="bar-head"><span class="bar-l">補正①: バリュエーション</span><span class="bar-v">0 / 5</span></div><div class="bar-bg"><div class="bar-fill" style="width:0%;background:#66bb6a"></div></div></div>
+<div class="bar-row"><div class="bar-head"><span class="bar-l">補正②: マクロ F&G</span><span class="bar-v">+2 / 5</span></div><div class="bar-bg"><div class="bar-fill" style="width:40%;background:#66bb6a"></div></div></div>
+</div>
+
+<div class="card" style="flex:1 1 300px">
+<div class="sec-t">VALUATION DETAIL</div>
+<div style="position:relative;height:62px;margin-bottom:12px;margin-top:6px">
+<div style="position:absolute;top:26px;left:0;right:0;height:5px;background:linear-gradient(90deg,rgba(41,121,255,.13) 0%,rgba(76,175,80,.13) 40%,rgba(255,109,0,.13) 100%);border-radius:3px"></div>
+<div style="position:absolute;top:14px;left:17.3%;transform:translateX(-50%);text-align:center"><div style="width:2px;height:16px;background:#2979ff;margin:0 auto;border-radius:1px"></div><div style="font-size:11px;color:#2979ff;font-weight:700;margin-top:2px">Bear</div><div class="m" style="font-size:12px;color:#2979ff">$85</div></div>
+<div style="position:absolute;top:14px;left:41.2%;transform:translateX(-50%);text-align:center"><div style="width:2px;height:16px;background:#b0b0c0;margin:0 auto;border-radius:1px"></div><div style="font-size:11px;color:#b0b0c0;font-weight:700;margin-top:2px">Base</div><div class="m" style="font-size:12px;color:#b0b0c0">$147</div></div>
+<div style="position:absolute;top:14px;left:85.8%;transform:translateX(-50%);text-align:center"><div style="width:2px;height:16px;background:#ff6d00;margin:0 auto;border-radius:1px"></div><div style="font-size:11px;color:#ff6d00;font-weight:700;margin-top:2px">Bull</div><div class="m" style="font-size:12px;color:#ff6d00">$263</div></div>
+<div style="position:absolute;top:4px;left:37.3%;transform:translateX(-50%);text-align:center;z-index:1"><div style="font-size:11px;color:#ff1744;font-weight:800">NOW</div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #ff1744;margin:0 auto"></div></div>
+</div>
+
+<div style="font-size:14px;color:#909098;line-height:1.8">
+<div>EV/Rev <b style="color:#e0e0f0">72x</b>　EV/FCF <b style="color:#e0e0f0">141x</b>　P/E <b style="color:#e0e0f0">218x</b></div>
+<div>Reverse DCF織込み: <b style="color:#ff6d00">41%</b> CAGR × 7年</div>
+<div>会社ガイダンス: <b style="color:#66bb6a">61%</b> (FY26)　PEG: <b style="color:#e0e0f0">0.59x</b> <span style="font-size:11px;color:#707088">※高成長期は要注意</span></div>
+<div style="margin-top:4px;color:#66bb6a;font-weight:600">→ 織込み＜ガイダンス = 成長余力あり</div>
+</div>
+</div>
+</div>
+
+<!-- Consensus Drift -->
+<div style="background:rgba(41,121,255,.04);border:1px solid rgba(41,121,255,.12);border-radius:12px;padding:14px 18px;margin-bottom:14px">
+<div style="font-size:13px;font-weight:700;color:#606078;letter-spacing:1px;margin-bottom:6px">CONSENSUS DRIFT (Yahoo Finance Analysis)</div>
+<div class="flex" style="gap:20px">
+<div style="font-size:14px;color:#a0a0b8">
+<span style="color:#707088">Q1 EPS Est:</span> <b class="m" style="color:#e0e0f0">$0.28</b>
+<span class="m" style="margin-left:8px;font-size:13px;color:#78909c;font-weight:700">Drift 0.0%</span>
+</div>
+<div style="font-size:14px;color:#a0a0b8">
+<span style="color:#707088">Q1 Rev Est:</span> <b class="m" style="color:#e0e0f0">$1.54B</b>
+<span class="m" style="margin-left:8px;font-size:13px;color:#78909c;font-weight:700">Drift 0.0%</span>
+</div>
+<div style="font-size:12px;color:#505068">T-90d初期値: EPS $0.28 / Rev $1.54B</div>
+</div>
+</div>
+
+<!-- Metrics Row -->
+<div class="flex" style="gap:8px;margin-bottom:16px">
+<div class="mini"><div class="mini-t">P/E (TTM)</div><div class="mini-v" style="color:#ef5350">218x</div><div class="mini-s">GAAP FY25</div></div>
+<div class="mini"><div class="mini-t">Fwd P/E</div><div class="mini-v" style="color:#ff6d00">57x</div><div class="mini-s">Adj OI FY27E</div></div>
+<div class="mini"><div class="mini-t">MKT Cap</div><div class="mini-v">$328B</div></div>
+<div class="mini"><div class="mini-t">PT Avg</div><div class="mini-v" style="color:#66bb6a">$188</div><div class="mini-s">+37%</div></div>
+<div class="mini"><div class="mini-t">Q1 EPS</div><div class="mini-v">$0.28</div><div class="mini-s">Est.</div></div>
+<div class="mini"><div class="mini-t">Q1 Rev</div><div class="mini-v">$1.54B</div><div class="mini-s">Est.</div></div>
+<div class="mini"><div class="mini-t">FCF Yld</div><div class="mini-v" style="color:#ffab00">1.2%</div><div class="mini-s">FY26E</div></div>
+</div>
+
+<!-- Integrated Judgment -->
+<div style="background:linear-gradient(135deg,rgba(120,144,156,.06),rgba(255,109,0,.04));border:1px solid rgba(120,144,156,.15);border-radius:12px;padding:18px 20px;margin-bottom:14px">
+<div style="font-size:13px;font-weight:700;color:#78909c;letter-spacing:1px;margin-bottom:8px">統合判断</div>
+<div class="flex" style="gap:10px;align-items:center">
+<span style="font-weight:800;color:#ff6d00;font-size:17px">やや強気</span>
+<span style="color:#505068;font-size:17px">×</span>
+<span style="font-weight:800;color:#78909c;font-size:17px">適正</span>
+<span style="color:#505068;font-size:17px">→</span>
+<span style="font-size:17px;font-weight:800;color:#ff6d00">Base接近中 — 好決算なら上昇余地、Drift要監視</span>
+</div>
+<div style="font-size:13px;color:#707088;margin-top:8px;line-height:1.6">
+v2.1.7時点ではBase乖離-12.3%（やや割安）→ 現在-7%（適正ゾーン入り）。株価がBase$147に接近中。コンセンサスDrift 0%で修正なし。好決算+アナリスト上方修正が入ればBull $263への道筋。一方、成長鈍化ならBear $85まで下落リスクあり（-38%）。
+</div>
+</div>
+
+<!-- Actions -->
+<div class="card" style="padding:16px 20px">
+<div style="font-size:13px;font-weight:700;color:#606078;letter-spacing:1px;margin-bottom:8px">NEXT ACTIONS</div>
+<div style="font-size:15px;color:#a0a0b8;line-height:1.8">
+<div>📊 <b>T-64日</b> — コンセンサスDrift監視中（EPS $0.28 / Rev $1.54B）</div>
+<div>📈 <b>T-7日 (4/28)</b> — F&G再取得 + QoQ確定 + 最終Pre-Earnings版生成</div>
+<div>⚡ <b>T-0日 (5/5)</b> — Actual入力 → 最終スコア＋バリュエーション → ポジション判断</div>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:14px;font-size:11px;color:#404058">PLTR Scorecard v2.1.8 + Valuation Model</div>
+</div>
+</body>
+</html>

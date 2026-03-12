@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earnings Highlights DB 運用マニュアル</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg-card:#181b24;--bg-card-alt:#1e2230;--bg-code:#12141c;--border:#2a2e3d;--text:#c8cdd8;--text-dim:#6b7280;--text-bright:#e8ecf4;--accent:#60a5fa;--accent-dim:#2563eb;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--purple:#a78bfa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15px;font-weight:300}
+.container{max-width:960px;margin:0 auto;padding:60px 32px 120px}
+.header{border-bottom:1px solid var(--border);padding-bottom:48px;margin-bottom:56px}
+.header-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+h1{font-family:'Source Serif 4',serif;font-size:40px;font-weight:700;color:var(--text-bright);line-height:1.3;margin-bottom:12px}
+.header-meta{font-size:13px;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
+.header-meta span{color:var(--accent)}
+.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:32px 36px;margin-bottom:56px}
+.toc-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;font-weight:500}
+.toc ol{list-style:none;counter-reset:toc}
+.toc li{counter-increment:toc;margin-bottom:8px}
+.toc li::before{content:counter(toc,decimal-leading-zero);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent-dim);margin-right:12px}
+.toc a{color:var(--text);text-decoration:none;font-weight:400;transition:color .2s}
+.toc a:hover{color:var(--accent)}
+section{margin-bottom:64px}
+h2{font-family:'Source Serif 4',serif;font-size:26px;font-weight:700;color:var(--text-bright);margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent-dim);margin-right:8px}
+h3{font-size:18px;font-weight:500;color:var(--text-bright);margin:32px 0 14px}
+h4{font-size:15px;font-weight:500;color:var(--accent);margin:24px 0 10px}
+p{margin-bottom:14px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:20px 0}
+.alert{border-radius:10px;padding:20px 24px;margin:20px 0;border-left:3px solid}
+.alert-danger{background:rgba(248,113,113,.06);border-color:var(--red)}
+.alert-danger .alert-title{color:var(--red)}
+.alert-warning{background:rgba(251,191,36,.06);border-color:var(--yellow)}
+.alert-warning .alert-title{color:var(--yellow)}
+.alert-info{background:rgba(96,165,250,.06);border-color:var(--accent)}
+.alert-info .alert-title{color:var(--accent)}
+.alert-title{font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.table-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-card-alt)}
+th{text-align:left;padding:12px 16px;font-weight:500;color:var(--text-bright);font-size:13px;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--bg-code);padding:2px 7px;border-radius:4px;color:var(--accent);border:1px solid var(--border)}
+pre{background:var(--bg-code);border:1px solid var(--border);border-radius:10px;padding:20px 24px;overflow-x:auto;margin:16px 0}
+pre code{background:none;border:none;padding:0;font-size:13px;line-height:1.7;color:var(--text)}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:4px;font-weight:500}
+.tag-csv{background:rgba(52,211,153,.15);color:var(--green)}
+.tag-md{background:rgba(96,165,250,.15);color:var(--accent)}
+.tag-xlsx{background:rgba(167,139,250,.15);color:var(--purple)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:20px 0}
+.flow-step{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 18px;font-size:14px}
+.flow-step .step-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);display:block;margin-bottom:4px}
+.flow-arrow{color:var(--text-dim);font-size:20px}
+ul,ol{margin:12px 0 12px 24px}
+li{margin-bottom:6px}
+.diagram{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:28px;margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;white-space:pre;overflow-x:auto}
+@media(max-width:640px){.container{padding:32px 16px 80px}h1{font-size:28px}h2{font-size:22px}.flow{flex-direction:column}.flow-arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="header">
+  <div class="header-label">Operations Manual</div>
+  <h1>Earnings Highlights DB<br>運用マニュアル</h1>
+  <div class="header-meta">GitHub: <span>misogai-match/earnings-insight</span> &mdash; Version <span>1.0</span> &mdash; <span>2026-03-03</span></div>
+</header>
+
+<nav class="toc">
+  <div class="toc-title">Contents</div>
+  <ol>
+    <li><a href="#purpose">目的と位置づけ</a></li>
+    <li><a href="#architecture">全体アーキテクチャ</a></li>
+    <li><a href="#repo">リポジトリ構成</a></li>
+    <li><a href="#csv-spec">サマリーCSV 仕様</a></li>
+    <li><a href="#md-template">個別Markdown テンプレート</a></li>
+    <li><a href="#workflow">決算発表時のワークフロー</a></li>
+    <li><a href="#query">横断分析の方法</a></li>
+    <li><a href="#github-ops">GitHub操作手順</a></li>
+    <li><a href="#rules">運用ルール・注意点</a></li>
+    <li><a href="#relation">決算チェックシートとの関係</a></li>
+  </ol>
+</nav>
+
+<section id="purpose">
+  <h2><span class="num">01</span>目的と位置づけ</h2>
+  <div class="card">
+    <h4>何のためのデータベースか</h4>
+    <p>決算チェックシート（<code>決算チェック_YYYYMMDD.xlsx</code>）が<strong>数値の時系列蓄積</strong>に特化しているのに対し、Earnings Highlights DBは<strong>定性情報を含む決算ハイライトの記録と横断分析</strong>を担う。</p>
+    <ul>
+      <li>Beat/Miss の数値サマリー（EPS、Revenue、EBITDA）</li>
+      <li>ガイダンスの方向と市場予想との乖離</li>
+      <li>経営陣のコメント、戦略変更、課題</li>
+      <li>マーケット反応（株価変動、アナリスト評価）</li>
+      <li>決算チェックシート更新時の技術メモ</li>
+    </ul>
+  </div>
+  <div class="alert alert-info">
+    <div class="alert-title">設計思想 — なぜxlsxと分離するか</div>
+    <ol>
+      <li><strong>リスク回避</strong>：8,700行×60列・36,000数式のxlsxを不必要に触る回数を減らす</li>
+      <li><strong>情報の性質が違う</strong>：数値はセル、定性情報はテキスト。フォーマットが根本的に異なる</li>
+      <li><strong>運用サイクルが違う</strong>：数値は一発入力、ハイライトは継続的に参照・振り返りする</li>
+    </ol>
+  </div>
+</section>
+
+<section id="architecture">
+  <h2><span class="num">02</span>全体アーキテクチャ</h2>
+  <p>決算関連の情報管理は、3つのレイヤーで構成される。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>レイヤー</th><th>ファイル</th><th>役割</th><th>管理場所</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag tag-xlsx">数値DB</span></td><td><code>決算チェック_YYYYMMDD.xlsx</code></td><td>EPS・Revenue・マージン等の時系列数値、数式による自動計算</td><td>GitHub + ローカル</td></tr>
+        <tr><td><span class="tag tag-csv">横断分析</span></td><td><code>summary-YYYYQN.csv</code></td><td>四半期ごとの全銘柄サマリー。フィルタ・ソートで横断比較</td><td>GitHub (earnings-insight)</td></tr>
+        <tr><td><span class="tag tag-md">詳細記録</span></td><td><code>YYYY-QN-TICKER.md</code></td><td>銘柄別の決算ハイライト。定性情報、KPI、技術メモ</td><td>GitHub (earnings-insight)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>データの流れ</h3>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">Source</span>IR プレスリリース<br>Yahoo Finance Analysis<br>Earnings Call</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step"><span class="step-num">Layer 1</span><span class="tag tag-xlsx">xlsx</span> 数値入力<br>Actual行・Estimate行</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step"><span class="step-num">Layer 2</span><span class="tag tag-md">MD</span> 詳細記録<br>数値＋定性＋技術メモ</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step"><span class="step-num">Layer 3</span><span class="tag tag-csv">CSV</span> 横断サマリー<br>1銘柄 = 1行</div>
+  </div>
+</section>
+
+<section id="repo">
+  <h2><span class="num">03</span>リポジトリ構成</h2>
+  <pre><code>earnings-insight/
+├── README.md
+├── ei_20260228.html
+└── highlights/                  ★ Earnings Highlights DB
+    ├── summary-columns.md       CSVカラム定義書
+    ├── summary-2025Q4.csv       2025Q4 横断サマリー
+    ├── 2025-Q4-NCLH.md          個別ハイライト
+    ├── 2025-Q4-CRWD.md          （今週以降追加）
+    └── ...</code></pre>
+  <div class="alert alert-info">
+    <div class="alert-title">命名規則</div>
+    <ul>
+      <li><strong>サマリーCSV</strong>：<code>summary-YYYYQN.csv</code>（例：<code>summary-2025Q4.csv</code>）</li>
+      <li><strong>個別Markdown</strong>：<code>YYYY-QN-TICKER.md</code>（例：<code>2025-Q4-NCLH.md</code>）</li>
+      <li>四半期の区切りはカレンダーQではなく、<strong>各社の会計Q</strong>に従う</li>
+    </ul>
+  </div>
+  <div class="alert alert-warning">
+    <div class="alert-title">注意 — xlsxはこのリポには入れない</div>
+    xlsxファイルはサイズが大きく、Git差分管理に向かない。xlsxは従来通り別管理。
+  </div>
+</section>
+
+<section id="csv-spec">
+  <h2><span class="num">04</span>サマリーCSV 仕様</h2>
+  <p>全30カラム、7つのカテゴリで構成。詳細は <code>summary-columns.md</code> を参照。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>カテゴリ</th><th>数</th><th>主要カラム</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>識別情報</td><td>5</td><td>ticker, company, quarter, earnings_date, sector</td><td>基本情報</td></tr>
+        <tr><td>実績 vs コンセンサス</td><td>9</td><td>eps/revenue/ebitda の actual, consensus, beat_pct</td><td>Beat/Miss の定量評価</td></tr>
+        <tr><td>成長率（YoY）</td><td>3</td><td>eps_yoy_pct, revenue_yoy_pct, ebitda_yoy_pct</td><td>前年同期比</td></tr>
+        <tr><td>マージン・CF</td><td>4</td><td>op_margin_pct/chg_bps, fcf_margin_pct/chg_bps</td><td>収益性の変化</td></tr>
+        <tr><td>ガイダンス</td><td>5</td><td>guidance_eps, guidance_direction 等</td><td>将来見通し</td></tr>
+        <tr><td>財務健全性</td><td>1</td><td>net_leverage</td><td>BS健全度</td></tr>
+        <tr><td>定性タグ・評価</td><td>4</td><td>tags, sentiment, stock_reaction_pct, summary</td><td>検索・総合評価</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>beat_pct の符号ルール</h3>
+  <div class="card">
+    <p><strong>正（+）</strong> = Beat、<strong>負（&minus;）</strong> = Miss</p>
+    <p>計算式：<code>(actual - consensus) / |consensus| &times; 100</code></p>
+    <p style="color:var(--text-dim)">ガイダンスの <code>guidance_*_vs_consensus_pct</code> も同じ符号ルール。</p>
+  </div>
+
+  <h3>tags カラムの運用</h3>
+  <div class="card">
+    <p>セミコロン区切りのフリーテキスト。頻出タグ例：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>カテゴリ</th><th>タグ例</th></tr></thead>
+        <tbody>
+          <tr><td>経営</td><td>CEO交代, CFO交代, 組織再編, リストラ</td></tr>
+          <tr><td>戦略</td><td>ガイダンス撤回, 上方修正, 自社株買い, M&amp;A</td></tr>
+          <tr><td>財務</td><td>デレバレッジ, コスト規律, マージン改善, 減損</td></tr>
+          <tr><td>事業</td><td>新製品, 市場拡大, 競争激化, 規制リスク</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--text-dim)">※ 固定リストではなく自然蓄積。同じ概念に異なるタグを使わないよう過去タグを確認してから付与。</p>
+  </div>
+
+  <h3>sentiment の基準</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>値</th><th>基準</th><th>典型パターン</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--green)"><strong>Positive</strong></td><td>実績Beat＋ガイダンス上方修正</td><td>EPS・Rev両方Beat、ガイダンス引き上げ</td></tr>
+        <tr><td style="color:var(--yellow)"><strong>Mixed</strong></td><td>良い面と悪い面が混在</td><td>EPS Beat だが Rev Miss、ガイダンス下方</td></tr>
+        <tr><td style="color:var(--red)"><strong>Negative</strong></td><td>実績Miss＋ガイダンス下方修正</td><td>EPS・Rev両方Miss、ガイダンス撤回</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="md-template">
+  <h2><span class="num">05</span>個別Markdown テンプレート</h2>
+  <p>1銘柄&times;1四半期で1ファイル。以下の6セクション構成。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Section</th><th>内容</th><th>情報源</th></tr></thead>
+      <tbody>
+        <tr><td>1. 数値サマリー</td><td>Q実績 vs コンセンサス、FY実績、ガイダンス</td><td>IR + Yahoo Finance</td></tr>
+        <tr><td>2. KPI・オペレーション</td><td>業界固有KPI（Occupancy, ARR, NRR等）</td><td>IR + Earnings Call</td></tr>
+        <tr><td>3. バランスシート</td><td>負債、レバレッジ、流動性</td><td>IR</td></tr>
+        <tr><td>4. 定性ハイライト</td><td>経営陣交代、戦略変更、ポジ/ネガ要素</td><td>IR + Earnings Call</td></tr>
+        <tr><td>5. マーケット反応</td><td>株価変動、アナリスト評価、PT</td><td>ニュースソース</td></tr>
+        <tr><td>6. xlsx反映メモ</td><td>xlsx更新時の技術メモ、注意点</td><td>実運用での発見</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="alert alert-warning">
+    <div class="alert-title">セクション2〜3は企業により大きく異なる</div>
+    KPIはセクター固有（クルーズ: Occupancy/Net Yield、SaaS: ARR/NRR等）。テンプレートは枠組みで、企業ごとにカスタマイズ。
+  </div>
+  <h3>テンプレート骨格</h3>
+  <pre><code># {TICKER} — {Q} {YEAR} Earnings Highlight
+
+> **{会社名}** (NYSE: {TICKER})
+> 決算発表: YYYY-MM-DD | 決算期: {Q} {YEAR} | 記録日: YYYY-MM-DD
+
+---
+## 1. 数値サマリー
+### 実績 vs コンセンサス
+| 指標 | Actual | Consensus | 差異 | Beat/Miss |
+
+### FY実績（通年データがある場合）
+### ガイダンス vs コンセンサス（ある場合）
+
+---
+## 2. KPI・オペレーション
+## 3. バランスシート
+## 4. 定性ハイライト
+### 経営陣コメント / 戦略面の変化
+### ポジティブ要素
+### ネガティブ要素
+
+---
+## 5. マーケット反応
+## 6. 決算チェックシートへの反映メモ
+
+*次回確認事項: ...*</code></pre>
+</section>
+
+<section id="workflow">
+  <h2><span class="num">06</span>決算発表時のワークフロー</h2>
+  <div class="flow">
+    <div class="flow-step"><span class="step-num">Step 1</span><span class="tag tag-xlsx">xlsx</span> Actual入力<br>決算チェックシートに数値入力</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step"><span class="step-num">Step 2</span><span class="tag tag-md">MD</span> 作成<br>6セクション構成で記録</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step"><span class="step-num">Step 3</span><span class="tag tag-csv">CSV</span> 追記<br>サマリーCSVに1行追加</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step"><span class="step-num">Step 4</span>GitHub Push<br>highlights/ にアップロード</div>
+  </div>
+  <div class="alert alert-info">
+    <div class="alert-title">タイミング</div>
+    Step 1（xlsx）は決算発表直後にClaudeチャットで実施。Step 2〜3 はその流れで続行。Markdown作成とCSV追記はClaudeが行い、GitHub PushはWeb UIから手動。
+  </div>
+  <h3>四半期の区切りでやること</h3>
+  <div class="card">
+    <ul>
+      <li>新しいサマリーCSVを作成（例：<code>summary-2026Q1.csv</code>）</li>
+      <li>前四半期のCSVはそのまま保存（上書きしない）</li>
+      <li>カラム定義に変更があれば <code>summary-columns.md</code> も同時更新</li>
+    </ul>
+  </div>
+</section>
+
+<section id="query">
+  <h2><span class="num">07</span>横断分析の方法</h2>
+  <p>サマリーCSVに対して、Claudeに日本語で質問するだけで横断分析ができる。</p>
+  <div class="card">
+    <h4>数値ベースの抽出</h4>
+    <ul>
+      <li>「2025Q4でEPSとRevenueの両方Beatした銘柄は？」</li>
+      <li>「ガイダンスが上方修正だった銘柄を一覧で」</li>
+      <li>「マージン改善が200bps以上だったのは？」</li>
+      <li>「株価反応が良かった順にソートして」</li>
+    </ul>
+    <h4 style="margin-top:16px">定性ベースの抽出</h4>
+    <ul>
+      <li>「CEO交代があった銘柄は？」 &rarr; <code>tags</code> で検索</li>
+      <li>「コスト改善が目立った銘柄の詳細を見せて」 &rarr; CSV &rarr; 該当MDを参照</li>
+      <li>「sentimentがNegativeだった銘柄の共通点は？」</li>
+    </ul>
+    <h4 style="margin-top:16px">複合条件</h4>
+    <ul>
+      <li>「EPS Beatだがガイダンス下方修正で株価が下がった銘柄」</li>
+      <li>「Revenue成長率トップ5のうちマージンも改善していたのは？」</li>
+    </ul>
+  </div>
+  <div class="alert alert-info">
+    <div class="alert-title">分析の流れ</div>
+    <strong>粗い絞り込み</strong>はCSVで行い、<strong>深掘り</strong>は個別Markdownを参照する2段階が基本パターン。
+  </div>
+</section>
+
+<section id="github-ops">
+  <h2><span class="num">08</span>GitHub操作手順</h2>
+  <h3>新規ファイルの追加（Markdown）</h3>
+  <div class="card">
+    <ol>
+      <li><code>earnings-insight</code> リポの <code>highlights/</code> フォルダに移動</li>
+      <li><strong>Add file</strong> &rarr; <strong>Upload files</strong></li>
+      <li>Claudeから受け取った <code>.md</code> ファイルをドラッグ&amp;ドロップ</li>
+      <li><strong>Commit changes</strong></li>
+    </ol>
+  </div>
+  <h3>CSVの更新（行追加）</h3>
+  <div class="card">
+    <h4>方法A：ファイル丸ごと差し替え（推奨）</h4>
+    <ol>
+      <li>Claudeから更新済みCSV全文を受け取る</li>
+      <li>GitHub上で CSV を開く &rarr; 鉛筆アイコン（Edit）</li>
+      <li>全選択 &rarr; 新しい内容で置換 &rarr; <strong>Commit changes</strong></li>
+    </ol>
+    <h4 style="margin-top:16px">方法B：末尾に1行追加</h4>
+    <ol>
+      <li>GitHub上で CSV を開く &rarr; Edit</li>
+      <li>最終行の後にClaude出力の1行をペースト &rarr; <strong>Commit changes</strong></li>
+    </ol>
+    <p style="color:var(--text-dim)">※ 方法Aが確実。列ズレを防げる。</p>
+  </div>
+  <h3>新しいフォルダの作成</h3>
+  <div class="card">
+    <p>GitHub Web UIでは空フォルダ作成不可。<strong>Add file &rarr; Create new file</strong> でファイル名欄に <code>フォルダ名/ファイル名</code> と入力すると同時作成される。</p>
+  </div>
+  <div class="alert alert-warning">
+    <div class="alert-title">CSVのカンマ・改行に注意</div>
+    <code>summary</code> や <code>tags</code> 内にカンマがある場合、値全体を <code>"..."</code> で囲む。Claude出力は処理済みだが、手動編集時は注意。
+  </div>
+</section>
+
+<section id="rules">
+  <h2><span class="num">09</span>運用ルール・注意点</h2>
+
+  <div class="alert alert-danger">
+    <div class="alert-title">ルール 1 — xlsxとHighlightsは独立運用</div>
+    決算チェックシート（xlsx）とHighlights DB（CSV + MD）は別系統。xlsxの運用ルール（数式保護、LibreOffice経由行挿入等）はHighlightsに無関係。逆も同様。
+  </div>
+
+  <div class="alert alert-warning">
+    <div class="alert-title">ルール 2 — CSVヘッダー行は変更しない</div>
+    1行目はカラム定義と一致が必要。カラム追加・変更時は <code>summary-columns.md</code> も同時更新。
+  </div>
+
+  <div class="alert alert-warning">
+    <div class="alert-title">ルール 3 — 過去CSVは上書きしない</div>
+    <code>summary-2025Q4.csv</code> はシーズン終了後もそのまま保存。新四半期は新CSVファイルを作成。
+  </div>
+
+  <div class="alert alert-info">
+    <div class="alert-title">ルール 4 — 不明点は自己判断しない</div>
+    不明点はMarkdownに「要確認」と明記して保留。推測値を入れない。決算チェック鉄則3と同じ精神。
+  </div>
+
+  <div class="alert alert-info">
+    <div class="alert-title">ルール 5 — tagsは自然蓄積</div>
+    事前に完全定義せず銘柄を重ねて蓄積。同一概念の表記揺れを避けるため過去タグを確認してから付与。
+  </div>
+
+  <div class="alert alert-info">
+    <div class="alert-title">ルール 6 — MarkdownはGitHub上で閲覧</div>
+    GitHubの自動レンダリングを利用。HTML化、GitHub Pages追加、ランチャー更新はいずれも不要。
+  </div>
+</section>
+
+<section id="relation">
+  <h2><span class="num">10</span>決算チェックシートとの関係</h2>
+
+  <div class="diagram">┌────────────────────────────────────┐
+│  決算チェック 運用マニュアル        │ ← xlsxの操作ルール
+│  (earnings-check-manual.html)      │
+└───────────┬────────────────────────┘
+            │ 参照
+            ▼
+┌────────────────────────────────────┐  ┌────────────────────────────────────┐
+│  決算チェック_YYYYMMDD.xlsx        │  │  Earnings Highlights DB            │
+│                                    │  │  (earnings-insight/highlights/)    │
+│  ・数値の時系列蓄積                │  │                                    │
+│  ・Estimate / Actual               │→ │  ・定性情報の記録                  │
+│  ・数式による自動計算              │  │  ・横断分析用CSV                   │
+│  ・バリュエーション指標            │  │  ・技術メモの蓄積                  │
+└────────────────────────────────────┘  └────────────────────────────────────┘
+            │                                        │
+            ▼                                        ▼
+┌────────────────────────────────────┐  ┌────────────────────────────────────┐
+│  IR / Yahoo Finance / Earnings Call│  │  GitHub Web UI (MD レンダリング)   │
+└────────────────────────────────────┘  └────────────────────────────────────┘</div>
+
+  <h3>Markdownセクション6が橋渡し</h3>
+  <div class="card">
+    <p>各銘柄Markdownのセクション6「xlsx反映メモ」は、xlsx更新時に発見した技術的注意点（セル書式問題、Diluted Shares選択、Gross Margin計算方法等）を記録する場所。次回同じ銘柄の決算時に前回の教訓を即座に参照できる。</p>
+  </div>
+
+  <h3>2つのマニュアルの棲み分け</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>決算チェック運用マニュアル</th><th>本マニュアル（Highlights DB）</th></tr></thead>
+      <tbody>
+        <tr><td>対象</td><td>決算チェック_YYYYMMDD.xlsx</td><td>highlights/ 配下の CSV + Markdown</td></tr>
+        <tr><td>主な内容</td><td>列マッピング、数式マップ、行挿入手順、Non-GAAP逆算</td><td>CSV仕様、MDテンプレート、横断分析、GitHub操作</td></tr>
+        <tr><td>更新頻度</td><td>新しい技術的発見時</td><td>運用フローやカラム仕様変更時</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer style="margin-top:80px;padding-top:32px;border-top:1px solid var(--border);text-align:center;color:var(--text-dim);font-size:13px;">
+  Earnings Highlights DB 運用マニュアル v1.0 — 2026-03-03 作成<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;">Maintained by まっち &amp; Claude</span>
+</footer>
+
+</div>
+</body>
+</html>

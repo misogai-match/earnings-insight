@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLTR Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080d;--surface:#0f1017;--card:#14151f;--border:#1e2030;
+  --text:#e8e8ed;--dim:#7a7d8e;--accent:#ef4444;--accent2:#f97316;
+  --green:#22c55e;--blue:#3b82f6;--purple:#a855f7;--cyan:#06b6d4;--yellow:#eab308;
+}
+html{font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue','Hiragino Sans',sans-serif;min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(239,68,68,.06),transparent)}
+
+/* === TOP NAV === */
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border)}
+.topnav-left{display:flex;align-items:center;gap:14px}
+.logo{font-family:'Courier New',monospace;font-weight:700;font-size:1.6rem;letter-spacing:.08em;color:var(--accent)}
+.logo span{color:var(--dim);font-weight:400;font-size:1rem;margin-left:6px}
+.ver{font-family:monospace;font-size:.72rem;background:var(--accent);color:#fff;padding:2px 8px;border-radius:3px}
+
+/* === MAIN TABS === */
+.main-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);padding:0 28px;overflow-x:auto}
+.main-tab{padding:14px 22px;font-size:.95rem;font-weight:600;color:var(--dim);cursor:pointer;border:none;
+  border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;background:none;font-family:inherit;letter-spacing:.02em}
+.main-tab:hover{color:var(--text);background:rgba(255,255,255,.02)}
+.main-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main-tab.signal-tab{color:var(--green)}
+.main-tab.signal-tab.active{color:var(--green);border-bottom-color:var(--green)}
+
+/* === PANELS === */
+.main-panel{display:none}
+.main-panel.active{display:block}
+
+/* === IFRAME === */
+.signal-frame{width:100%;border:none;background:var(--bg)}
+
+/* === CONTENT === */
+.content{padding:20px 28px 40px;max-width:1200px;margin:0 auto}
+
+/* === CHART GRID === */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.cg.full{grid-template-columns:1fr}
+@media(max-width:860px){.cg{grid-template-columns:1fr}}
+
+.cc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px 14px}
+.ct{font-size:.85rem;font-weight:700;color:var(--text);letter-spacing:.04em;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.ct .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+canvas{width:100%!important;height:auto!important}
+
+/* === CHART EXPLANATION === */
+.chart-explain{font-size:.82rem;color:var(--dim);line-height:1.55;margin-bottom:12px;padding:8px 12px;
+  background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid var(--border)}
+.chart-explain strong{color:var(--text)}
+.chart-explain .good{color:var(--green);font-weight:600}
+.chart-explain .warn{color:var(--yellow);font-weight:600}
+.chart-explain .bad{color:var(--accent);font-weight:600}
+
+/* === EVALUATION BADGE === */
+.eval{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-left:auto}
+.eval-excellent{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.eval-good{background:rgba(6,182,212,.12);color:var(--cyan);border:1px solid rgba(6,182,212,.3)}
+.eval-caution{background:rgba(234,179,8,.12);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+
+/* === KPI HIGHLIGHT CARDS === */
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
+.kc .l{font-size:.78rem;color:var(--dim);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.kc .v{font-family:monospace;font-size:1.6rem;font-weight:700}
+.kc .s{font-size:.78rem;color:var(--dim);margin-top:4px}
+.kc .up{color:var(--green)}.kc .dn{color:var(--accent)}
+
+/* === LEGEND === */
+.leg{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0 6px}
+.leg-i{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--dim)}
+.leg-d{width:12px;height:12px;border-radius:3px}
+
+/* === NOTE === */
+.note{margin-top:24px;padding:14px 16px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);
+  border-radius:8px;font-size:.82rem;color:var(--dim);line-height:1.6}
+.note strong{color:var(--accent)}
+
+/* === FOOTER === */
+.footer{text-align:center;padding:20px;font-family:monospace;font-size:.75rem;color:var(--dim);border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- === TOP NAV === -->
+<div class="topnav">
+  <div class="topnav-left">
+    <div class="logo">PLTR <span>DASHBOARD</span></div>
+    <span class="ver">v2.1.8 + KPI v1.1</span>
+  </div>
+</div>
+
+<!-- === MAIN TABS === -->
+<div class="main-tabs" id="mainTabs">
+  <button class="main-tab signal-tab active" data-panel="signal-panel">&#x26A1; Live Signal</button>
+  <button class="main-tab" data-panel="panel-revenue">&#x1F4C8; &#x58F2;&#x4E0A; &amp; &#x6210;&#x9577;</button>
+  <button class="main-tab" data-panel="panel-profit">&#x1F4B0; &#x53CE;&#x76CA;&#x6027;</button>
+  <button class="main-tab" data-panel="panel-cash">&#x1F4B5; &#x30AD;&#x30E3;&#x30C3;&#x30B7;&#x30E5; &amp; &#x52B9;&#x7387;</button>
+  <button class="main-tab" data-panel="panel-customer">&#x1F465; &#x9867;&#x5BA2; &amp; NDR</button>
+  <button class="main-tab" data-panel="panel-earnings">&#x1F4CA; EPS &amp; Beat</button>
+</div>
+
+<!-- === SIGNAL PANEL (iframe) === -->
+<div class="main-panel active" id="signal-panel">
+  <iframe class="signal-frame" id="signalFrame" src="PLTR_LiveSignal_v2.1.8_20260302.html"></iframe>
+</div>
+
+<!-- === KPI PANELS === -->
+<div class="main-panel" id="panel-revenue"><div class="content">
+  <div class="kr" id="kpi-revenue"></div>
+  <div class="cg full"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--accent)"></span>TOTAL REVENUE ($M) &amp; YoY GROWTH (%)
+      <span class="eval eval-excellent" id="ev-rev"></span></div>
+    <div class="chart-explain" id="ex-rev"></div>
+    <div class="leg" id="legend-rev"></div>
+    <canvas id="chart-revenue" height="300"></canvas>
+  </div></div>
+  <div class="cg"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--blue)"></span>GOV / COMMERCIAL SPLIT ($M)</div>
+    <div class="chart-explain" id="ex-split"></div>
+    <canvas id="chart-split" height="260"></canvas>
+  </div><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--green)"></span>US COMMERCIAL YoY GROWTH (%)</div>
+    <div class="chart-explain" id="ex-uscomm"></div>
+    <canvas id="chart-uscomm" height="260"></canvas>
+  </div></div>
+</div></div>
+
+<div class="main-panel" id="panel-profit"><div class="content">
+  <div class="kr" id="kpi-profit"></div>
+  <div class="cg full"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--green)"></span>ADJ. OP MARGIN &amp; GAAP OP MARGIN (%)
+      <span class="eval eval-excellent" id="ev-margin"></span></div>
+    <div class="chart-explain" id="ex-margin"></div>
+    <div class="leg" id="legend-margin"></div>
+    <canvas id="chart-margin" height="300"></canvas>
+  </div></div>
+  <div class="cg"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--purple)"></span>ADJ. OPERATING INCOME ($M)</div>
+    <div class="chart-explain" id="ex-opincome"></div>
+    <canvas id="chart-opincome" height="260"></canvas>
+  </div><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--yellow)"></span>SBC % OF REVENUE</div>
+    <div class="chart-explain" id="ex-sbc"></div>
+    <canvas id="chart-sbc" height="260"></canvas>
+  </div></div>
+</div></div>
+
+<div class="main-panel" id="panel-cash"><div class="content">
+  <div class="kr" id="kpi-cash"></div>
+  <div class="cg"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--green)"></span>ADJ. FREE CASH FLOW ($M)</div>
+    <div class="chart-explain" id="ex-fcf"></div>
+    <canvas id="chart-fcf" height="260"></canvas>
+  </div><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--cyan)"></span>FCF MARGIN (%)</div>
+    <div class="chart-explain" id="ex-fcfm"></div>
+    <canvas id="chart-fcfmargin" height="260"></canvas>
+  </div></div>
+  <div class="cg full"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--accent)"></span>RULE OF 40 (Revenue YoY% + FCF Margin%)
+      <span class="eval eval-excellent" id="ev-r40"></span></div>
+    <div class="chart-explain" id="ex-r40"></div>
+    <canvas id="chart-ruleof40" height="300"></canvas>
+  </div></div>
+</div></div>
+
+<div class="main-panel" id="panel-customer"><div class="content">
+  <div class="kr" id="kpi-customer"></div>
+  <div class="cg full"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--blue)"></span>TOTAL CUSTOMER COUNT &amp; NET ADDITIONS</div>
+    <div class="chart-explain" id="ex-cust"></div>
+    <div class="leg" id="legend-cust"></div>
+    <canvas id="chart-customers" height="300"></canvas>
+  </div></div>
+  <div class="cg full"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--purple)"></span>NET DOLLAR RETENTION (%)
+      <span class="eval eval-excellent" id="ev-ndr"></span></div>
+    <div class="chart-explain" id="ex-ndr"></div>
+    <canvas id="chart-ndr" height="280"></canvas>
+  </div></div>
+</div></div>
+
+<div class="main-panel" id="panel-earnings"><div class="content">
+  <div class="kr" id="kpi-earnings"></div>
+  <div class="cg full"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--green)"></span>GAAP EPS (DILUTED)
+      <span class="eval eval-excellent" id="ev-eps"></span></div>
+    <div class="chart-explain" id="ex-eps"></div>
+    <canvas id="chart-eps" height="300"></canvas>
+  </div></div>
+  <div class="cg"><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--accent)"></span>EPS BEAT (%)</div>
+    <div class="chart-explain" id="ex-epsb"></div>
+    <canvas id="chart-epsbeat" height="260"></canvas>
+  </div><div class="cc">
+    <div class="ct"><span class="dot" style="background:var(--blue)"></span>REVENUE BEAT (%)</div>
+    <div class="chart-explain" id="ex-revb"></div>
+    <canvas id="chart-revbeat" height="260"></canvas>
+  </div></div>
+</div></div>
+
+<div class="footer">PLTR Dashboard v2.1.8 + KPI Trends v1.1 &middot; Earnings Scorecard System &middot; 2026-03-10</div>
+
+<script>
+// =====================================================================
+//  KPI DATA &#8212; Excel&#12300;KPI Dashboard&#12301;&#12471;&#12540;&#12488;&#12363;&#12425;&#24046;&#12375;&#26367;&#12360;&#21487;&#33021;
+// =====================================================================
+const KPI_DATA={
+quarters:["Q1'22","Q2'22","Q3'22","Q4'22","Q1'23","Q2'23","Q3'23","Q4'23","Q1'24","Q2'24","Q3'24","Q4'24","Q1'25","Q2'25","Q3'25","Q4'25"],
+totalRevenue:[446,473,478,509,525,533,558,608,634,678,726,828,884,1006,1181,1407],
+govRevenue:[242,263,250,275,289,296,308,334,335,371,408,454,503,556,616,722],
+revenueYoY:[31,26,22,18,18,13,17,19,21,27,30,36,39,48,63,70],
+usCommYoY:[54,46,53,67,26,20,23,40,40,55,54,64,95,94,122,137],
+adjOpMargin:[26,23,17,20,22,25,29,34,36,38,38,45,44,46,51,57],
+gaapOpMargin:[-7,-8,-13,-5,-3,1,7,13,12,17,19,11,27,30,36,43],
+adjOpIncome:[117,107,81,104,117,135,163,209,226,254,276,373,391,462,601,798],
+sbcPctRevenue:[33,31,30,26,25,24,22,22,24,21,19,34,18,16,15,14],
+adjFCF:[-45,-3,37,104,192,96,141,305,148,149,435,517,370,569,540,791],
+fcfMargin:[-10,-1,8,20,37,18,25,50,23,22,60,62,42,57,46,56],
+ruleOf40:[57,49,39,38,40,38,46,54,68,70,68,81,80,94,114,127],
+customerCount:[277,304,321,367,373,421,453,497,554,593,629,711,769,843,896,954],
+ndr:[119,120,119,115,111,109,107,110,111,114,118,120,124,128,134,139],
+gaapEPS:[-0.05,-0.09,-0.06,0.01,-0.01,0.01,0.03,0.04,0.04,0.06,0.06,0.03,0.13,0.15,0.20,0.24],
+epsBeat:[100,150,100,67,300,0,50,33,33,50,50,27,0,23,31,9],
+revBeat:[1.4,1.6,1.5,2.0,0.8,1.1,2.3,2.4,3.0,3.8,4.7,6.7,2.4,1.8,5.4,12.9]
+};
+const D=KPI_DATA;
+const COL={accent:'#ef4444',accent2:'#f97316',green:'#22c55e',blue:'#3b82f6',purple:'#a855f7',cyan:'#06b6d4',yellow:'#eab308',dim:'#4a4d5e',text:'#e8e8ed',grid:'#1e2030'};
+const commRev=D.totalRevenue.map((t,i)=>t-D.govRevenue[i]);
+const netAdd=D.customerCount.map((c,i)=>i===0?0:c-D.customerCount[i-1]);
+const L=D.totalRevenue.length-1;
+
+// =====================================================================
+//  EXPLANATIONS & EVALUATIONS
+// =====================================================================
+const EX={
+rev:{
+  text:'<strong>Total Revenue</strong>&#65306;&#22235;&#21322;&#26399;&#12372;&#12392;&#12398;&#32207;&#22770;&#19978;&#12290;&#26834;&#12464;&#12521;&#12501;&#12364;&#22770;&#19978;&#38989;&#12289;&#25240;&#12428;&#32218;&#12364;YoY&#25104;&#38263;&#29575;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#25104;&#38263;&#29575;&#12364;&#22235;&#21322;&#26399;&#12372;&#12392;&#12395;&#21152;&#36895;&#12377;&#12427;&#12300;&#21152;&#36895;&#25104;&#38263;&#12301;&#12497;&#12479;&#12540;&#12531;</span>&#12290;&#28187;&#36895;&#12399;&#25104;&#29087;&#21270;&#12398;&#12469;&#12452;&#12531;&#12290;',
+  eval:'&#9733; &#27598;Q&#21152;&#36895;&#12289;Q4\'25&#12391;+70%',badge:'eval-excellent'
+},
+split:{
+  text:'<strong>Gov vs Commercial</strong>&#65306;&#22770;&#19978;&#12398;&#27083;&#25104;&#27604;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;Commercial&#27604;&#29575;&#12364;&#19978;&#26119;&#12375;&#12289;&#25919;&#24220;&#20381;&#23384;&#12363;&#12425;&#33073;&#21364;</span>&#12290;&#25919;&#24220;100%&#12384;&#12392;&#22865;&#32004;&#12522;&#12473;&#12463;&#39640;&#12356;&#12290;'
+},
+uscomm:{
+  text:'<strong>US Commercial YoY</strong>&#65306;AIP&#65288;AI&#12503;&#12521;&#12483;&#12488;&#12501;&#12457;&#12540;&#12512;&#65289;&#12398;&#26222;&#21450;&#24230;&#12434;&#26368;&#12418;&#30452;&#25509;&#21453;&#26144;&#12377;&#12427;&#25351;&#27161;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;50%&#36229;&#12360;&#12398;&#39640;&#25104;&#38263;</span>&#12290;&#29694;&#22312;+137%&#12391;&#30064;&#27425;&#20803;&#12290;'
+},
+margin:{
+  text:'<strong>Adj. Op Margin</strong>&#65288;&#23455;&#32218;&#65289;&#12392;<strong>GAAP Op Margin</strong>&#65288;&#30772;&#32218;&#65289;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#20001;&#26041;&#19978;&#26119;&#12289;GAAP&#12418;&#40658;&#23383;&#23433;&#23450;</span>&#12290;GAAP&#12364;&#36196;&#23383;&#12384;&#12392;SBC&#12364;&#21033;&#30410;&#12434;&#25276;&#12375;&#28528;&#12375;&#12390;&#12356;&#12427;&#12290;',
+  eval:'GAAP 34%&#12289;Adj 57%&#12288;&#20849;&#12395;&#36942;&#21435;&#26368;&#39640;',badge:'eval-excellent'
+},
+opincome:{
+  text:'<strong>Adj. Operating Income</strong>&#65306;&#22770;&#19978;&#12363;&#12425;SBC&#12434;&#38500;&#22806;&#12375;&#12383;&#21942;&#26989;&#21033;&#30410;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#22770;&#19978;&#20197;&#19978;&#12398;&#12506;&#12540;&#12473;&#12391;&#22679;&#21152;&#65288;&#12458;&#12506;&#12524;&#12540;&#12486;&#12451;&#12531;&#12464;&#12524;&#12496;&#12524;&#12483;&#12472;&#65289;</span>&#12290;'
+},
+sbc:{
+  text:'<strong>SBC % of Revenue</strong>&#65306;&#26666;&#24335;&#22577;&#37228;&#12364;&#22770;&#19978;&#12398;&#20309;%&#12434;&#21344;&#12417;&#12427;&#12363;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;20%&#20197;&#19979;&#12364;&#20581;&#20840;&#27700;&#28310;</span>&#12289;<span class="warn">&#9679; &#27880;&#24847;&#65306;30%&#36229;&#12399;&#24076;&#34180;&#21270;&#12364;&#27671;&#12395;&#12394;&#12427;</span>&#12290;53%&#8594;13%&#12392;&#21127;&#30340;&#25913;&#21892;&#12290;'
+},
+fcf:{
+  text:'<strong>Adj. Free Cash Flow</strong>&#65306;&#23455;&#38555;&#12395;&#20250;&#31038;&#12395;&#20837;&#12387;&#12390;&#12367;&#12427;&#29694;&#37329;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#22235;&#21322;&#26399;&#12372;&#12392;&#12395;&#22679;&#21152;&#12289;&#12363;&#12388;&#12503;&#12521;&#12473;&#22287;&#32173;&#25345;</span>&#12290;&#36196;&#23383;FCF&#12398;&#20225;&#26989;&#12399;&#12461;&#12515;&#12483;&#12471;&#12517;&#12434;&#29123;&#12420;&#12375;&#12390;&#12356;&#12427;&#12290;'
+},
+fcfm:{
+  text:'<strong>FCF Margin</strong>&#65306;&#22770;&#19978;&#12395;&#23550;&#12377;&#12427;FCF&#12398;&#21106;&#21512;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;30%&#36229;&#12360;&#12391;&#20778;&#33391;SaaS</span>&#12289;50%&#36229;&#12360;&#12399;&#30064;&#27425;&#20803;&#12290;&#29694;&#22312;51%&#12391;S&P 500&#12488;&#12483;&#12503;&#12463;&#12521;&#12473;&#12290;'
+},
+r40:{
+  text:'<strong>Rule of 40</strong>&#65306;Revenue YoY% + FCF Margin%&#12290;SaaS&#20581;&#20840;&#24615;&#12398;&#37329;&#23383;&#22612;&#25351;&#27161;&#12290;<span class="good">&#9679; 40&#36229;&#12360;&#65306;&#20581;&#20840;</span>&#12289;<span class="good">80&#36229;&#12360;&#65306;&#21331;&#36234;</span>&#12289;100&#36229;&#12360;&#65306;&#30064;&#27425;&#20803;&#12290;&#29694;&#22312;127&#12391;&#12300;Rule of 127&#12301;&#12290;',
+  eval:'127% &#8212; SaaS&#21490;&#19978;&#26368;&#39640;&#27700;&#28310;',badge:'eval-excellent'
+},
+cust:{
+  text:'<strong>&#38738;&#65306;&#32207;&#38990;&#23458;&#25968;</strong>&#12289;<strong>&#12458;&#12524;&#12531;&#12472;&#65306;&#32020;&#22679;&#21152;&#25968;</strong>&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#38990;&#23458;&#25968;&#22679;&#21152; &amp; &#32020;&#22679;&#21152;&#12506;&#12540;&#12473;&#12364;&#21152;&#36895;</span>&#12290;&#32020;&#22679;&#21152;&#12364;&#28187;&#23569;&#12377;&#12427;&#12392;&#29554;&#24471;&#12398;&#38957;&#25171;&#12385;&#12290;'
+},
+ndr:{
+  text:'<strong>Net Dollar Retention</strong>&#65306;&#26082;&#23384;&#38990;&#23458;&#12363;&#12425;&#12398;&#22770;&#19978;&#32173;&#25345;&#29575;&#12290;100%&#36229;&#12360;=&#12450;&#12483;&#12503;&#12475;&#12523;&#12364;&#12481;&#12515;&#12540;&#12531;&#12434;&#19978;&#22238;&#12427;&#12290;<span class="good">&#9679; 120%&#36229;&#65306;&#20778;&#33391;&#12289;130%&#36229;&#65306;&#21331;&#36234;</span>&#12290;&#12300;&#33073;Palantir&#65309;&#33075;&#12398;&#19968;&#37096;&#20999;&#38500;&#12301;&#12398;&#19990;&#30028;&#12290;',
+  eval:'139% &#8212; 5Q&#36899;&#32154;&#19978;&#26119;&#12289;&#36942;&#21435;&#26368;&#39640;',badge:'eval-excellent'
+},
+eps:{
+  text:'<strong>GAAP EPS (Diluted)</strong>&#65306;&#24076;&#34180;&#21270;&#24460;&#12398;1&#26666;&#24403;&#12383;&#12426;&#21033;&#30410;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#12503;&#12521;&#12473;&#22287;&#32173;&#25345; &amp; &#22679;&#21152;&#12488;&#12524;&#12531;&#12489;</span>&#12290;&#36196;&#23383;EPS&#12364;&#32154;&#12367;&#20225;&#26989;&#12399;&#21454;&#30410;&#21270;&#12395;&#35506;&#38988;&#12290;',
+  eval:'$0.25 &#8212; Q4\'25&#36942;&#21435;&#26368;&#39640;',badge:'eval-excellent'
+},
+epsb:{
+  text:'<strong>EPS Beat %</strong>&#65306;&#12467;&#12531;&#12475;&#12531;&#12469;&#12473;&#20104;&#24819;&#12434;&#12393;&#12428;&#12384;&#12369;&#19978;&#22238;&#12387;&#12383;&#12363;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#27598;Q&#23433;&#23450;&#30340;&#12395;Beat</span>&#12290;&#22823;&#12365;&#12377;&#12366;&#12427;Beat&#12399;&#12467;&#12531;&#12475;&#12531;&#12469;&#12473;&#12364;&#36861;&#12356;&#12388;&#12356;&#12390;&#12356;&#12394;&#12356;&#35388;&#25312;&#12290;'
+},
+revb:{
+  text:'<strong>Revenue Beat %</strong>&#65306;&#22770;&#19978;&#12364;&#12467;&#12531;&#12475;&#12531;&#12469;&#12473;&#12434;&#12393;&#12428;&#12384;&#12369;&#19978;&#22238;&#12387;&#12383;&#12363;&#12290;<span class="good">&#9679; &#29702;&#24819;&#65306;&#27598;Q Beat&#12289;Beat&#24133;&#25313;&#22823;&#12399;&#12450;&#12490;&#12522;&#12473;&#12488;&#12364;&#36861;&#12356;&#12388;&#12369;&#12394;&#12356;&#25104;&#38263;</span>&#12290;'
+}
+};
+document.getElementById('ex-rev').innerHTML=EX.rev.text;
+document.getElementById('ev-rev').textContent=EX.rev.eval;
+document.getElementById('ex-split').innerHTML=EX.split.text;
+document.getElementById('ex-uscomm').innerHTML=EX.uscomm.text;
+document.getElementById('ex-margin').innerHTML=EX.margin.text;
+document.getElementById('ev-margin').textContent=EX.margin.eval;
+document.getElementById('ex-opincome').innerHTML=EX.opincome.text;
+document.getElementById('ex-sbc').innerHTML=EX.sbc.text;
+document.getElementById('ex-fcf').innerHTML=EX.fcf.text;
+document.getElementById('ex-fcfm').innerHTML=EX.fcfm.text;
+document.getElementById('ex-r40').innerHTML=EX.r40.text;
+document.getElementById('ev-r40').textContent=EX.r40.eval;
+document.getElementById('ex-cust').innerHTML=EX.cust.text;
+document.getElementById('ex-ndr').innerHTML=EX.ndr.text;
+document.getElementById('ev-ndr').textContent=EX.ndr.eval;
+document.getElementById('ex-eps').innerHTML=EX.eps.text;
+document.getElementById('ev-eps').textContent=EX.eps.eval;
+document.getElementById('ex-epsb').innerHTML=EX.epsb.text;
+document.getElementById('ex-revb').innerHTML=EX.revb.text;
+
+// =====================================================================
+//  CHART ENGINE
+// =====================================================================
+class Ch{
+  constructor(id){this.cv=document.getElementById(id);if(!this.cv)return;this.cx=this.cv.getContext('2d');this.dp=window.devicePixelRatio||1;this.p={t:28,r:20,b:40,l:56};this.tt=null;this.sz();window.addEventListener('resize',()=>{this.sz();this.dr()});this.cv.addEventListener('mousemove',e=>{const r=this.cv.getBoundingClientRect();const x=e.clientX-r.left;const a=this.area();const n=D.quarters.length;const idx=Math.round((x-a.x)/a.w*(n-1));this.tt=(idx>=0&&idx<n&&x>=a.x&&x<=a.x+a.w)?idx:null;this.dr()});this.cv.addEventListener('mouseleave',()=>{this.tt=null;this.dr()})}
+  sz(){const r=this.cv.parentElement.getBoundingClientRect();const w=r.width-40;const h=parseInt(this.cv.getAttribute('height'))||260;this.cv.width=w*this.dp;this.cv.height=h*this.dp;this.cv.style.width=w+'px';this.cv.style.height=h+'px';this.cx.setTransform(this.dp,0,0,this.dp,0,0);this.w=w;this.h=h}
+  area(){return{x:this.p.l,y:this.p.t,w:this.w-this.p.l-this.p.r,h:this.h-this.p.t-this.p.b}}
+  grid(mn,mx,u='',cnt=5){const a=this.area();const c=this.cx;c.strokeStyle=COL.grid;c.lineWidth=1;c.fillStyle=COL.dim;c.font='11px monospace';c.textAlign='right';for(let i=0;i<=cnt;i++){const v=mn+(mx-mn)*i/cnt;const y=a.y+a.h-(a.h*i/cnt);c.beginPath();c.moveTo(a.x,y);c.lineTo(a.x+a.w,y);c.stroke();let lb=u==='$'?'$'+Math.round(v):u==='eps'?v.toFixed(2):Math.round(v)+(u||'');c.fillText(lb,a.x-8,y+4)}c.textAlign='center';c.font='11px monospace';for(let i=0;i<D.quarters.length;i+=2){const x=a.x+(a.w/(D.quarters.length-1))*i;c.fillText(D.quarters[i],x,a.y+a.h+20)}}
+  bars(d,col,mn,mx){const a=this.area();const c=this.cx;const n=d.length;const gw=a.w/n;const bw=gw*0.6;for(let i=0;i<n;i++){if(d[i]==null)continue;const x=a.x+gw*i+gw*0.2;const bh=((d[i]-mn)/(mx-mn))*a.h;const y=a.y+a.h-bh;c.fillStyle=col;c.globalAlpha=this.tt===i?1:0.8;c.beginPath();c.moveTo(x+3,y);c.lineTo(x+bw-3,y);c.quadraticCurveTo(x+bw,y,x+bw,y+3);c.lineTo(x+bw,a.y+a.h);c.lineTo(x,a.y+a.h);c.lineTo(x,y+3);c.quadraticCurveTo(x,y,x+3,y);c.fill();c.globalAlpha=1;if(this.tt===i){c.fillStyle='#fff';c.font='bold 12px monospace';c.textAlign='center';let lb=mn<0?(d[i]>=0?'+':'')+d[i]:''+d[i];c.fillText(lb,x+bw/2,y-6)}}}
+  stacked(d1,d2,c1,c2,mx){const a=this.area();const c=this.cx;const n=d1.length;const gw=a.w/n;const bw=gw*0.6;for(let i=0;i<n;i++){const x=a.x+gw*i+gw*0.2;const h1=(d1[i]/mx)*a.h;const h2=(d2[i]/mx)*a.h;c.globalAlpha=this.tt===i?1:0.75;c.fillStyle=c1;c.fillRect(x,a.y+a.h-h1,bw,h1);c.fillStyle=c2;c.fillRect(x,a.y+a.h-h1-h2,bw,h2);c.globalAlpha=1;if(this.tt===i){c.fillStyle='#fff';c.font='bold 11px monospace';c.textAlign='center';c.fillText('G:'+d1[i]+' C:'+d2[i],x+bw/2,a.y+a.h-h1-h2-8)}}}
+  line(d,col,mn,mx,dash=false,lw=2.5){const a=this.area();const c=this.cx;c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';if(dash)c.setLineDash([6,5]);else c.setLineDash([]);c.beginPath();let s=false;for(let i=0;i<d.length;i++){if(d[i]==null)continue;const x=a.x+(a.w/(d.length-1))*i;const y=a.y+a.h-((d[i]-mn)/(mx-mn))*a.h;if(!s){c.moveTo(x,y);s=true}else c.lineTo(x,y)}c.stroke();c.setLineDash([]);for(let i=0;i<d.length;i++){if(d[i]==null)continue;const x=a.x+(a.w/(d.length-1))*i;const y=a.y+a.h-((d[i]-mn)/(mx-mn))*a.h;c.fillStyle=this.tt===i?'#fff':col;c.beginPath();c.arc(x,y,this.tt===i?5:3.5,0,Math.PI*2);c.fill();if(this.tt===i){c.fillStyle='#fff';c.font='bold 12px monospace';c.textAlign='center';let lb=mn<-1?(d[i]>=0?'+':'')+d[i]+'%':d[i]+(typeof d[i]==='number'&&d[i]%1!==0?'':'');c.fillText(lb,x,y-10)}}}
+  ref(v,mn,mx,col,lb){const a=this.area();const c=this.cx;const y=a.y+a.h-((v-mn)/(mx-mn))*a.h;c.strokeStyle=col;c.lineWidth=1;c.setLineDash([5,4]);c.beginPath();c.moveTo(a.x,y);c.lineTo(a.x+a.w,y);c.stroke();c.setLineDash([]);if(lb){c.fillStyle=col;c.font='bold 11px monospace';c.textAlign='right';c.fillText(lb,a.x+a.w,y-5)}}
+  ttl(){if(this.tt==null)return;const a=this.area();const n=D.quarters.length;const x=a.x+(a.w/(n-1))*this.tt;this.cx.strokeStyle='rgba(255,255,255,0.12)';this.cx.lineWidth=1;this.cx.beginPath();this.cx.moveTo(x,a.y);this.cx.lineTo(x,a.y+a.h);this.cx.stroke();this.cx.fillStyle=COL.text;this.cx.font='bold 12px monospace';this.cx.textAlign='center';this.cx.fillText(D.quarters[this.tt],x,a.y-8)}
+  dr(){}
+}
+
+// =====================================================================
+//  TAB SWITCHING
+// =====================================================================
+const charts=[];
+function resizeIframe(){const f=document.getElementById('signalFrame');if(f&&f.contentWindow){try{f.style.height=f.contentWindow.document.documentElement.scrollHeight+'px'}catch(e){f.style.height='2000px'}}}
+document.querySelectorAll('.main-tab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.main-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.main-panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');const p=document.getElementById(t.dataset.panel);p.classList.add('active');if(t.dataset.panel==='signal-panel'){setTimeout(resizeIframe,100)}else{charts.forEach(c=>{c.sz();c.dr()})}})});
+document.getElementById('signalFrame').addEventListener('load',resizeIframe);
+setTimeout(resizeIframe,500);setTimeout(resizeIframe,1500);
+
+// =====================================================================
+//  KPI CARDS
+// =====================================================================
+function kc(l,v,s,cls=''){return '<div class="kc"><div class="l">'+l+'</div><div class="v '+cls+'">'+v+'</div><div class="s">'+s+'</div></div>'}
+document.getElementById('kpi-revenue').innerHTML=kc("Q4'25 Revenue",'$'+D.totalRevenue[L]+'M','YoY +'+D.revenueYoY[L]+'%','up')+kc('FY25 Revenue','$'+Math.round(D.totalRevenue.slice(12,16).reduce((a,b)=>a+b))+'M','+56% YoY','up')+kc('Growth Accel',D.revenueYoY[L-1]+'%  \u2192  '+D.revenueYoY[L]+'%','Q3\u2192Q4 \u52A0\u901F','up')+kc('US Comm YoY','+'+D.usCommYoY[L]+'%','\u904E\u53BB\u6700\u9AD8','up');
+document.getElementById('kpi-profit').innerHTML=kc('Adj. Op Margin',D.adjOpMargin[L]+'%','Q4\'25','up')+kc('GAAP Op Margin',D.gaapOpMargin[L]+'%','GAAP\u9ED2\u5B57\u7D99\u7D9A','up')+kc('Adj. OI','$'+D.adjOpIncome[L]+'M','Q4\'25','up')+kc('SBC/Rev',D.sbcPctRevenue[L]+'%',D.sbcPctRevenue[0]+'%\u2192'+D.sbcPctRevenue[L]+'%','up');
+document.getElementById('kpi-cash').innerHTML=kc('Q4 FCF','$'+D.adjFCF[L]+'M','Margin '+D.fcfMargin[L]+'%','up')+kc('FY25 FCF','$'+Math.round(D.adjFCF.slice(12,16).reduce((a,b)=>a+b))+'M','~51%','up')+kc('Rule of 40',D.ruleOf40[L]+'%','Rule of 127','up')+kc('Cash','$7.2B','No debt','up');
+document.getElementById('kpi-customer').innerHTML=kc('Customers',D.customerCount[L].toLocaleString(),'Q4\'25','up')+kc('Net Add','+'+netAdd[L],'Q4\'25','up')+kc('NDR',D.ndr[L]+'%','5Q\u9023\u7D9A\u4E0A\u6607','up')+kc('NDR Range',Math.min(...D.ndr)+'%\u2192'+D.ndr[L]+'%','16Q','up');
+document.getElementById('kpi-earnings').innerHTML=kc("Q4 GAAP EPS",'$'+D.gaapEPS[L].toFixed(2),'FY25: $'+D.gaapEPS.slice(12,16).reduce((a,b)=>a+b).toFixed(2),'up')+kc('EPS Beat','16/16 Q','\u5168Q Beat','up')+kc('Rev Beat','16/16 Q','\u5168Q Beat','up')+kc('Avg Rev Beat','+'+(D.revBeat.reduce((a,b)=>a+b,0)/D.revBeat.length).toFixed(1)+'%','vs Consensus','up');
+
+// =====================================================================
+//  LEGENDS
+// =====================================================================
+function leg(id,items){document.getElementById(id).innerHTML=items.map(([c,l])=>'<div class="leg-i"><div class="leg-d" style="background:'+c+'"></div>'+l+'</div>').join('')}
+leg('legend-rev',[[COL.accent,'Revenue ($M)'],[COL.yellow,'YoY Growth (%)']]);
+leg('legend-margin',[[COL.green,'Adj. Op Margin'],[COL.blue,'GAAP Op Margin'],[COL.dim,'Break-even (0%)']]);
+leg('legend-cust',[[COL.blue,'Customer Count'],[COL.accent2,'Net Additions']]);
+
+// =====================================================================
+//  ALL CHARTS
+// =====================================================================
+const c1=new Ch('chart-revenue');
+c1.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=1600;const mg=80;this.grid(0,mx,'$');this.bars(D.totalRevenue,COL.accent,0,mx);const sc=D.revenueYoY.map(v=>v/mg*mx);this.line(sc,COL.yellow,0,mx,false,2.5);const a=this.area();this.cx.textAlign='left';this.cx.fillStyle=COL.yellow;this.cx.font='11px monospace';for(let i=0;i<=5;i++){const v=Math.round(mg*i/5);const y=a.y+a.h-(a.h*i/5);this.cx.fillText(v+'%',a.x+a.w+4,y+4)}this.ttl()};c1.dr();charts.push(c1);
+
+const c1b=new Ch('chart-split');
+c1b.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=1600;this.grid(0,mx,'$');this.stacked(D.govRevenue,commRev,COL.blue,COL.cyan,mx);this.cx.font='11px monospace';this.cx.fillStyle=COL.blue;this.cx.fillRect(this.p.l+4,6,12,12);this.cx.fillStyle=COL.dim;this.cx.textAlign='left';this.cx.fillText('Gov',this.p.l+20,16);this.cx.fillStyle=COL.cyan;this.cx.fillRect(this.p.l+56,6,12,12);this.cx.fillStyle=COL.dim;this.cx.fillText('Commercial',this.p.l+72,16);this.ttl()};c1b.dr();charts.push(c1b);
+
+const c1c=new Ch('chart-uscomm');
+c1c.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=160;this.grid(0,mx,'%');this.bars(D.usCommYoY,COL.green,0,mx);this.line(D.usCommYoY,COL.green,0,mx,false,1.5);this.ttl()};c1c.dr();charts.push(c1c);
+
+const c2=new Ch('chart-margin');
+c2.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mn=-30;const mx=70;this.grid(mn,mx,'%');this.ref(0,mn,mx,COL.dim,'0%');this.line(D.adjOpMargin,COL.green,mn,mx,false,3);this.line(D.gaapOpMargin,COL.blue,mn,mx,true,2.5);this.ttl()};c2.dr();charts.push(c2);
+
+const c2b=new Ch('chart-opincome');
+c2b.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=900;this.grid(0,mx,'$');this.bars(D.adjOpIncome,COL.purple,0,mx);this.line(D.adjOpIncome,COL.purple,0,mx,false,1.5);this.ttl()};c2b.dr();charts.push(c2b);
+
+const c2c=new Ch('chart-sbc');
+c2c.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=60;this.grid(0,mx,'%');this.ref(20,0,mx,COL.yellow,'20% \u5065\u5168\u30E9\u30A4\u30F3');this.bars(D.sbcPctRevenue,COL.yellow,0,mx);this.line(D.sbcPctRevenue,COL.yellow,0,mx,false,1.5);this.ttl()};c2c.dr();charts.push(c2c);
+
+const c3=new Ch('chart-fcf');
+c3.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=800;this.grid(0,mx,'$');this.bars(D.adjFCF,COL.green,0,mx);this.line(D.adjFCF,COL.green,0,mx,false,1.5);this.ttl()};c3.dr();charts.push(c3);
+
+const c3b=new Ch('chart-fcfmargin');
+c3b.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=60;this.grid(0,mx,'%');this.ref(30,0,mx,COL.dim,'30% \u512A\u826F');this.line(D.fcfMargin,COL.cyan,0,mx,false,3);this.ttl()};c3b.dr();charts.push(c3b);
+
+const c3c=new Ch('chart-ruleof40');
+c3c.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=140;this.grid(0,mx,'%');this.ref(40,0,mx,COL.yellow,'Rule of 40');this.ref(100,0,mx,COL.accent,'Rule of 100');this.bars(D.ruleOf40,COL.accent,0,mx);this.line(D.ruleOf40,COL.accent,0,mx,false,2.5);this.ttl()};c3c.dr();charts.push(c3c);
+
+const c4=new Ch('chart-customers');
+c4.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=1200;this.grid(0,mx);const a=this.area();const n=D.customerCount.length;const gw=a.w/n;const bw=gw*0.6;for(let i=0;i<n;i++){const x=a.x+gw*i+gw*0.2;const bh=(D.customerCount[i]/mx)*a.h;this.cx.fillStyle=COL.blue;this.cx.globalAlpha=this.tt===i?1:0.75;this.cx.fillRect(x,a.y+a.h-bh,bw*0.55,bh);this.cx.globalAlpha=1;if(i>0){const abh=(netAdd[i]/mx)*a.h;this.cx.fillStyle=COL.accent2;this.cx.globalAlpha=this.tt===i?1:0.85;this.cx.fillRect(x+bw*0.6,a.y+a.h-abh,bw*0.35,abh);this.cx.globalAlpha=1}if(this.tt===i){this.cx.fillStyle='#fff';this.cx.font='bold 12px monospace';this.cx.textAlign='center';this.cx.fillText(D.customerCount[i]+(i>0?' (+'+netAdd[i]+')':''),x+bw/2,a.y+a.h-((D.customerCount[i]/mx)*a.h)-8)}}this.ttl()};c4.dr();charts.push(c4);
+
+const c4b=new Ch('chart-ndr');
+c4b.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mn=100;const mx=145;this.grid(mn,mx,'%');this.ref(100,mn,mx,COL.dim,'100%');this.ref(120,mn,mx,COL.green,'120% \u512A\u826F');const a=this.area();const g=this.cx.createLinearGradient(0,a.y,0,a.y+a.h);g.addColorStop(0,'rgba(168,85,247,0.25)');g.addColorStop(1,'rgba(168,85,247,0)');this.cx.fillStyle=g;this.cx.beginPath();for(let i=0;i<D.ndr.length;i++){const x=a.x+(a.w/(D.ndr.length-1))*i;const y=a.y+a.h-((D.ndr[i]-mn)/(mx-mn))*a.h;if(i===0)this.cx.moveTo(x,y);else this.cx.lineTo(x,y)}this.cx.lineTo(a.x+a.w,a.y+a.h);this.cx.lineTo(a.x,a.y+a.h);this.cx.closePath();this.cx.fill();this.line(D.ndr,COL.purple,mn,mx,false,3);this.ttl()};c4b.dr();charts.push(c4b);
+
+const c5=new Ch('chart-eps');
+c5.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mn=-0.05;const mx=0.30;this.grid(mn,mx,'eps');this.ref(0,mn,mx,COL.dim,'$0.00');const a=this.area();const n=D.gaapEPS.length;const gw=a.w/n;const bw=gw*0.6;for(let i=0;i<n;i++){const v=D.gaapEPS[i];const x=a.x+gw*i+gw*0.2;const zy=a.y+a.h-((0-mn)/(mx-mn))*a.h;const vy=a.y+a.h-((v-mn)/(mx-mn))*a.h;this.cx.fillStyle=v>=0?COL.green:COL.accent;this.cx.globalAlpha=this.tt===i?1:0.8;if(v>=0)this.cx.fillRect(x,vy,bw,zy-vy);else this.cx.fillRect(x,zy,bw,vy-zy);this.cx.globalAlpha=1;if(this.tt===i){this.cx.fillStyle='#fff';this.cx.font='bold 12px monospace';this.cx.textAlign='center';this.cx.fillText('$'+v.toFixed(2),x+bw/2,vy-8)}}this.line(D.gaapEPS,COL.green,mn,mx,false,2);this.ttl()};c5.dr();charts.push(c5);
+
+const c5b=new Ch('chart-epsbeat');
+c5b.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=350;this.grid(0,mx,'%');this.bars(D.epsBeat,COL.accent,0,mx);this.ttl()};c5b.dr();charts.push(c5b);
+
+const c5c=new Ch('chart-revbeat');
+c5c.dr=function(){this.cx.clearRect(0,0,this.w,this.h);const mx=10;this.grid(0,mx,'%');this.bars(D.revBeat,COL.blue,0,mx);this.line(D.revBeat,COL.blue,0,mx,false,1.5);this.ttl()};c5c.dr();charts.push(c5c);
+</script>
+</body>
+</html>

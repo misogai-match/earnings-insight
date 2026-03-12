@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月次請求書作成プロセス | 株式会社磯貝</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --text: #1c1917;
+  --text-mid: #57534e;
+  --text-light: #a8a29e;
+  --accent: #b91c1c;
+  --accent-light: #fef2f2;
+  --border: #e7e5e4;
+  --border-strong: #d6d3d1;
+  --code-bg: #1e1e2e;
+  --code-text: #cdd6f4;
+  --step-bg: #fffbeb;
+  --step-border: #f59e0b;
+  --warn-bg: #fef2f2;
+  --warn-border: #ef4444;
+  --ok-bg: #f0fdf4;
+  --ok-border: #22c55e;
+  --info-bg: #eff6ff;
+  --info-border: #3b82f6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  --radius: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(135deg, #1c1917 0%, #292524 100%);
+  color: #fff;
+  padding: 3rem 2rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(185,28,28,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+header .inner {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+header h1 {
+  font-size: 1.9rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.4rem;
+}
+header .subtitle {
+  color: #a8a29e;
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+header .badge {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(185,28,28,0.2);
+  border: 1px solid rgba(185,28,28,0.4);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #fca5a5;
+  font-weight: 500;
+}
+
+/* ===== NAV ===== */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+nav .inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav .inner::-webkit-scrollbar { display: none; }
+nav a {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--text-mid);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ===== MAIN ===== */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ===== SECTIONS ===== */
+section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+h2 .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.6rem;
+  color: var(--text);
+}
+h4 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 1rem 0 0.5rem;
+  color: var(--text-mid);
+}
+
+p { margin-bottom: 0.8rem; }
+
+/* ===== TABLES ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+}
+thead th {
+  background: #292524;
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+thead th:first-child { border-radius: var(--radius) 0 0 0; }
+thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+tbody td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:hover { background: #fafaf9; }
+tbody tr:last-child td { border-bottom: none; }
+td code {
+  background: #f5f5f4;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+/* ===== CODE BLOCKS ===== */
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1.2rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+pre .comment { color: #6c7086; }
+pre .string { color: #a6e3a1; }
+pre .keyword { color: #cba6f7; }
+
+/* ===== CALLOUTS ===== */
+.callout {
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  border-left: 4px solid;
+}
+.callout.warn {
+  background: var(--warn-bg);
+  border-color: var(--warn-border);
+}
+.callout.info {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+}
+.callout.ok {
+  background: var(--ok-bg);
+  border-color: var(--ok-border);
+}
+.callout.step {
+  background: var(--step-bg);
+  border-color: var(--step-border);
+}
+.callout strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* ===== STEP CARDS ===== */
+.step-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.step-card .step-header {
+  background: #f5f5f4;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+.step-card .step-header .step-num {
+  background: var(--accent);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.step-card .step-body {
+  padding: 1rem;
+}
+.step-card .step-body ul { padding-left: 1.2rem; }
+.step-card .step-body li { margin-bottom: 0.4rem; }
+
+/* ===== CHECKLIST ===== */
+.checklist {
+  list-style: none;
+  padding: 0;
+}
+.checklist li {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+.checklist li:last-child { border-bottom: none; }
+.checklist li::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-strong);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+.checklist li:hover::before { border-color: var(--accent); }
+
+/* ===== LISTS ===== */
+ul, ol { padding-left: 1.5rem; }
+li { margin-bottom: 0.3rem; }
+
+/* ===== FOOTER ===== */
+footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.8rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  header { padding: 2rem 1.2rem; }
+  header h1 { font-size: 1.4rem; }
+  main { padding: 1rem; }
+  section { padding: 1.2rem; }
+  nav a { padding: 0.6rem 0.7rem; font-size: 0.75rem; }
+}
+
+/* ===== PRINT ===== */
+@media print {
+  nav { display: none; }
+  section { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1>月次請求書作成プロセス</h1>
+    <div class="subtitle">株式会社磯貝 ─ 業務委託請求書の作成・管理マニュアル</div>
+    <span class="badge">📌 毎月月初に実施</span>
+  </div>
+</header>
+
+<nav>
+  <div class="inner">
+    <a href="#prep">1. 準備</a>
+    <a href="#steps">2. 作成ステップ</a>
+    <a href="#ref">3. テンプレート構造</a>
+    <a href="#pitfalls">4. 落とし穴</a>
+    <a href="#version">5. バージョン管理</a>
+    <a href="#checklist">6. チェックリスト</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===== 1. PREPARATION ===== -->
+<section id="prep">
+  <h2><span class="num">1</span>ソースファイルの準備</h2>
+
+  <h3>アップロードするファイル</h3>
+  <table>
+    <thead>
+      <tr><th>ファイル</th><th>説明</th><th>注意点</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>勤務実績_YYYYMMDD_v*.xlsx</code></td>
+        <td>当月の勤務実績</td>
+        <td>対象月のシートにデータが入っていること</td>
+      </tr>
+      <tr>
+        <td><code>【磯貝 政文】業務委託請求書_YYYYMM_v*.xlsx</code></td>
+        <td>請求書テンプレート</td>
+        <td><strong>過去月シートは極力削除してからアップロード</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>⚠️ コンテキスト節約のための重要事項</strong>
+    テンプレートExcelに過去月のシート（例：202501〜202512）が大量に残っていると、Claudeのコンテキストを圧迫して途中で「これ以上圧縮できません」エラーになる。<br>
+    <strong>アップロード前に、直近1ヶ月分（コピー元）のシートだけ残して過去月を削除する。</strong>
+    各社ごとに「セパレータ→」「請求書シート」「勤務実績シート」の3枚構成。コピー元として1セットあればOK。
+  </div>
+
+  <h3>シート構成の基本</h3>
+<pre>
+<span class="comment">テンプレートExcel内のシート構成:</span>
+
+差異一覧_YYYYMM              <span class="comment">← 差異一覧・変更履歴（常に一番左）</span>
+
+[会社名]→                    <span class="comment">← セパレータ（色分け用）</span>
+YYYYMM_[会社名]              <span class="comment">← 請求書シート（当月作成対象）</span>
+[会社名]_YYYYMM              <span class="comment">← 勤務実績シート（当月作成対象）</span>
+YYYY前月_[会社名]             <span class="comment">← 前月の請求書（コピー元）</span>
+[会社名]_YYYY前月             <span class="comment">← 前月の勤務実績（コピー元、削除可）</span>
+<span class="comment">（↑ 各社分繰り返し）</span>
+
+Invoice_template              <span class="comment">← 空テンプレート（常に一番右）</span>
+</pre>
+</section>
+
+<!-- ===== 2. STEPS ===== -->
+<section id="steps">
+  <h2><span class="num">2</span>作成ステップ</h2>
+
+  <!-- Step 1 -->
+  <div class="step-card">
+    <div class="step-header"><span class="step-num">1</span>請求書シートのコピー作成</div>
+    <div class="step-body">
+      <p>前月の請求書シート（例：<code>202601_インターシフト</code>）からコピーして当月シートを作成。<strong>既に当月シートが存在する会社はスキップ。</strong></p>
+
+      <div class="callout warn">
+        <strong>⚠️ 社印画像に注意</strong>
+        openpyxlの<code>copy_worksheet()</code>では社印画像がコピーされない。<br>
+        <strong>zip/XMLレベル</strong>でシートファイル・ドローイング・画像参照を丸ごとコピーする必要がある。
+      </div>
+
+      <h4>zip/XMLでコピーすべきファイル</h4>
+      <ul>
+        <li><code>xl/worksheets/sheetN.xml</code> → 新しいsheet番号で複製</li>
+        <li><code>xl/worksheets/_rels/sheetN.xml.rels</code> → ドローイング参照を更新して複製</li>
+        <li><code>xl/drawings/drawingN.xml</code> → 新しいdrawing番号で複製</li>
+        <li><code>xl/drawings/_rels/drawingN.xml.rels</code> → image1.pngへの参照（そのまま）</li>
+        <li><code>xl/printerSettings/</code> → 印刷設定も複製</li>
+        <li><code>workbook.xml</code>、<code>workbook.xml.rels</code>、<code>[Content_Types].xml</code> に新シートを登録</li>
+      </ul>
+
+      <div class="callout info">
+        <strong>💡 rId衝突に注意</strong>
+        既存の最大rId番号を確認してから採番する（例：rId102〜）。衝突するとファイルが壊れる。
+      </div>
+
+      <h4>コピー後の更新</h4>
+      <table>
+        <thead><tr><th>セル</th><th>操作</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr><td><code>N4</code></td><td>当月末日に更新</td><td>例：2026/2/28</td></tr>
+          <tr><td><code>J16</code></td><td>空欄にクリア</td><td>後のステップで入力</td></tr>
+          <tr><td><code>C6</code></td><td>触らない</td><td>数式で自動更新（ただしrecalc必須）</td></tr>
+          <tr><td><code>M13</code></td><td>触らない</td><td>数式で自動更新</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-card">
+    <div class="step-header"><span class="step-num">2</span>勤務実績シートの作成・データ入力</div>
+    <div class="step-body">
+      <p>前月の勤務実績シートからコピーし、当月データを入力。画像がないのでopenpyxlでデータ書き込み可能。<br>
+      ただし<strong>シート構造自体のコピーはzip/XMLレベルで行う</strong>（ステップ1と同時に処理するのが安全）。</p>
+
+      <div class="callout warn">
+        <strong>⚠️ 曜日が英語になる問題</strong>
+        元データの曜日は <code>=TEXT(A10,"ddd")</code> 数式。LibreOfficeが英語ロケールで実行されるため <code>Wed</code>, <code>Thu</code> 等になる。<br>
+        <strong>Pythonで日本語曜日を直接書き込む：</strong>
+      </div>
+
+<pre>
+JP_DAYS = [<span class="string">'月'</span>, <span class="string">'火'</span>, <span class="string">'水'</span>, <span class="string">'木'</span>, <span class="string">'金'</span>, <span class="string">'土'</span>, <span class="string">'日'</span>]
+jp_day = JP_DAYS[date_val.weekday()]
+</pre>
+
+      <h4>セル書式</h4>
+      <table>
+        <thead><tr><th>列</th><th>書式</th><th>注意</th></tr></thead>
+        <tbody>
+          <tr><td>A（日付）</td><td><code>yyyy/m/d</code></td><td>明示的に設定</td></tr>
+          <tr><td>B（曜日）</td><td>テキスト</td><td>日本語で直接書き込み</td></tr>
+          <tr><td>C, D（時刻）</td><td><code>h:mm</code></td><td>明示的に設定</td></tr>
+          <tr><td>F2（合計）</td><td>数式</td><td><code>=SUM(F5:F100)</code> 触らない</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-card">
+    <div class="step-header"><span class="step-num">3</span>請求書シートに時間を入力</div>
+    <div class="step-body">
+      <p>各社の<code>J16</code>セルに勤務実績の合計時間を入力。</p>
+
+      <div class="callout ok">
+        <strong>✅ 金額関連セルは全て数式なので触らない</strong>
+        <code>O16</code>（金額）= J16 × L16 ／
+        <code>L27</code>（小計）= SUM(O16:Q19) ／
+        <code>L28</code>（消費税）= ROUNDDOWN(L27 × 10%, 0) ／
+        <code>L29</code>（立替経費）= O21 ／
+        <code>L30</code>（合計）= L27 + L28 + L29
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step-card">
+    <div class="step-header"><span class="step-num">4</span>差異確認・バージョン管理</div>
+    <div class="step-body">
+      <p>勤務実績ファイルの税込金額と請求書の税込金額を比較し、差異一覧シートに記録。<br>
+      <strong>差異一覧シートは常に一番左に配置する。</strong></p>
+
+      <h4>差異が出る主な原因</h4>
+      <table>
+        <thead><tr><th>原因</th><th>詳細</th><th>影響</th></tr></thead>
+        <tbody>
+          <tr><td><strong>時間の丸め</strong></td><td>93.3333...h → 93.33h</td><td>小数第3位以下の切捨てで金額に差</td></tr>
+          <tr><td><strong>消費税の端数切捨て</strong></td><td>ROUNDDOWNによる切捨て</td><td>数円〜数十円の差異</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <strong>💡 バージョン管理</strong>
+        内容に変更が入るたびに <code>v[番号]</code> を+1。差異一覧シートに変更履歴を記録。
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step-card">
+    <div class="step-header"><span class="step-num">5</span>PDF出力</div>
+    <div class="step-body">
+      <p>各社ごとに2ページのPDFを作成（請求書 + 勤務実績）。</p>
+
+      <h4>PDF出力の手順</h4>
+      <ol>
+        <li>一時的な単一クライアント用xlsx（請求書+勤務実績の2シート）を作成</li>
+        <li>印刷範囲・fitToPage設定</li>
+        <li>LibreOffice <code>--headless --convert-to pdf</code> で変換</li>
+      </ol>
+
+<pre>
+<span class="comment"># 印刷範囲の設定</span>
+ws.print_area = <span class="string">'A1:Q39'</span>  <span class="comment"># R列以降の非表示列を除外</span>
+
+<span class="comment"># fitToPage設定</span>
+<span class="comment"># sheetPr/pageSetUpPr: fitToPage="1"</span>
+<span class="comment"># pageSetup: paperSize="9"(A4), fitToWidth="1", fitToHeight="1"</span>
+</pre>
+
+      <div class="callout warn">
+        <strong>⚠️ 日付書式を必ず確認</strong>
+        <code>N4</code>（請求日）と <code>M13</code>（支払期限）の両方を <code>yyyy"年"m"月"d"日"</code> に設定。<br>
+        デフォルトの <code>m/d/yyyy</code> や <code>[$-F800]dddd, mmmm dd, yyyy</code> だとLibreOfficeで英語表示になる。
+      </div>
+
+      <h4>PDF命名規則</h4>
+<pre>
+【磯貝 政文】業務委託請求書_YYYYMMDD - [会社名]様.pdf
+<span class="comment">例：【磯貝 政文】業務委託請求書_20260228 - インターシフト様.pdf</span>
+</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3. TEMPLATE REFERENCE ===== -->
+<section id="ref">
+  <h2><span class="num">3</span>テンプレート構造リファレンス</h2>
+
+  <h3>請求書シート（39行 × 21列）</h3>
+  <table>
+    <thead><tr><th>セル</th><th>内容</th><th>種類</th></tr></thead>
+    <tbody>
+      <tr><td><code>A1</code></td><td>「請　求　書」</td><td>固定テキスト</td></tr>
+      <tr><td><code>A3</code></td><td>宛先会社名 +「御中」</td><td>テキスト</td></tr>
+      <tr><td><code>N4</code></td><td>請求日</td><td style="color:var(--accent);font-weight:700">日付（要入力）</td></tr>
+      <tr><td><code>C6</code></td><td>件名</td><td>数式（N4参照）</td></tr>
+      <tr><td><code>K6〜K9</code></td><td>会社名・住所・電話</td><td>固定</td></tr>
+      <tr><td><code>L13</code></td><td>合計金額</td><td>数式（=L30）</td></tr>
+      <tr><td><code>M13</code></td><td>お支払期限</td><td>数式（N4参照）</td></tr>
+      <tr><td><code>J16</code></td><td>業務時間</td><td style="color:var(--accent);font-weight:700">数値（要入力）</td></tr>
+      <tr><td><code>L16</code></td><td>単価</td><td>固定（5,600）</td></tr>
+      <tr><td><code>O16</code></td><td>金額</td><td>数式（=J16×L16）</td></tr>
+      <tr><td><code>L27</code></td><td>小計</td><td>数式</td></tr>
+      <tr><td><code>L28</code></td><td>消費税</td><td>数式（ROUNDDOWN）</td></tr>
+      <tr><td><code>L29</code></td><td>立替経費</td><td>数式</td></tr>
+      <tr><td><code>L30</code></td><td>合計（税込）</td><td>数式</td></tr>
+      <tr><td><code>T6</code></td><td>税率（0.1）</td><td>非表示列</td></tr>
+      <tr><td><code>U6</code></td><td>源泉税率（0.1021）</td><td>非表示列</td></tr>
+      <tr><td><code>A27〜B30</code></td><td>振込先情報</td><td>固定</td></tr>
+    </tbody>
+  </table>
+
+  <h3>勤務実績シート</h3>
+  <table>
+    <thead><tr><th>セル</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>F1</code></td><td>「時間」</td></tr>
+      <tr><td><code>E2</code> / <code>F2</code></td><td>「Total」 / 合計時間（=SUM(F5:F100)）</td></tr>
+      <tr><td><code>A4:F4</code></td><td>ヘッダー（日付/曜日/開始時間/終了時間/請求先/時間）</td></tr>
+      <tr><td><code>A5〜</code></td><td>データ行</td></tr>
+    </tbody>
+  </table>
+
+  <h3>取引先一覧</h3>
+  <table>
+    <thead><tr><th>キー</th><th>正式名称</th></tr></thead>
+    <tbody>
+      <tr><td>インターシフト</td><td>株式会社インターシフト</td></tr>
+      <tr><td>リクソル</td><td>株式会社リクソル</td></tr>
+      <tr><td>キャリアビジョン</td><td>株式会社キャリアビジョン</td></tr>
+      <tr><td>セオテック</td><td>株式会社THEO TEC</td></tr>
+      <tr><td>Pronetix</td><td>ProNetix株式会社</td></tr>
+    </tbody>
+  </table>
+
+  <h3>振込先（全社共通）</h3>
+  <div class="callout info" style="font-size:0.9rem;">
+    GMOあおぞらネット銀行 ／ 法人第二営業部 ／ 普通 ／ 1658438 ／ カ）イソガイ
+  </div>
+</section>
+
+<!-- ===== 4. PITFALLS ===== -->
+<section id="pitfalls">
+  <h2><span class="num">4</span>技術的な落とし穴まとめ</h2>
+  <table>
+    <thead><tr><th>問題</th><th>原因</th><th>対策</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>社印画像がコピーされない</td>
+        <td>openpyxlの<code>copy_worksheet()</code>は画像非対応</td>
+        <td>zip/XMLレベルでdrawing含めてコピー</td>
+      </tr>
+      <tr>
+        <td>件名が前月のまま</td>
+        <td>XMLコピー時にC6の数式キャッシュ値が古い</td>
+        <td><code>recalc.py</code> で再計算</td>
+      </tr>
+      <tr>
+        <td>曜日が英語（Wed等）</td>
+        <td>LibreOfficeの<code>TEXT()</code>が英語ロケール</td>
+        <td>Pythonで日本語曜日を直接書き込み</td>
+      </tr>
+      <tr>
+        <td>日付が <code>3/31/2026</code></td>
+        <td>M13の書式が <code>m/d/yyyy</code></td>
+        <td><code>yyyy"年"m"月"d"日"</code> に変更</td>
+      </tr>
+      <tr>
+        <td>請求日が英語表示</td>
+        <td>N4の書式が <code>[$-F800]dddd...</code></td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>rId衝突でシートが壊れる</td>
+        <td>新シートのrIdが既存と重複</td>
+        <td>最大rId+100〜で採番</td>
+      </tr>
+      <tr>
+        <td>PDFに余計な列が出る</td>
+        <td>印刷範囲未設定</td>
+        <td><code>print_area='A1:Q39'</code></td>
+      </tr>
+      <tr>
+        <td>recalcで画像消失？</td>
+        <td>openpyxlのDrawingML警告</td>
+        <td>実際には消えない（警告のみ）</td>
+      </tr>
+      <tr>
+        <td>コンテキスト枯渇</td>
+        <td>テンプレートに過去月シートが大量</td>
+        <td>アップロード前に不要シート削除</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== 5. VERSION CONTROL ===== -->
+<section id="version">
+  <h2><span class="num">5</span>バージョン管理ルール</h2>
+
+  <h3>ファイル命名</h3>
+<pre>
+【磯貝 政文】業務委託請求書_YYYYMM_v[番号]_[日付].xlsx
+<span class="comment">例：【磯貝 政文】業務委託請求書_202602_v4_20260301.xlsx</span>
+</pre>
+
+  <h3>ルール</h3>
+  <ul>
+    <li>内容に変更が入るたびにバージョン番号を <strong>+1</strong></li>
+    <li>日付は作業日（YYYYMMDD）</li>
+    <li>v1は存在しない（原本がv2として始まる場合はそれに従う）</li>
+    <li>差異一覧シートの下部に「変更履歴」セクションを設け、各バージョンの変更内容を記録</li>
+  </ul>
+</section>
+
+<!-- ===== 6. CHECKLIST ===== -->
+<section id="checklist">
+  <h2><span class="num">6</span>月次チェックリスト</h2>
+  <ul class="checklist">
+    <li>ソースファイル準備（不要シート削除済み）</li>
+    <li>ステップ1：請求書シートコピー（zip/XML、社印確認）</li>
+    <li>ステップ2：勤務実績シート作成・データ入力（曜日は日本語）</li>
+    <li>ステップ3：J16に時間入力</li>
+    <li>recalc実行・検証</li>
+    <li>ステップ4：差異確認・差異一覧シート更新・バージョン管理</li>
+    <li>ステップ5：PDF出力（日付書式・印刷範囲確認）</li>
+    <li>最終確認（社印・日付・金額・勤務実績の全行表示）</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  株式会社磯貝 ─ 月次請求書作成プロセス v1.0 ─ 2026年3月
+</footer>
+
+</body>
+</html>

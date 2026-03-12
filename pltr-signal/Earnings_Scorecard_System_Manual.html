@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earnings Scorecard System — Architecture & Operations Manual</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a14;
+  --bg2: #0e0e1c;
+  --bg3: #141428;
+  --border: rgba(255,255,255,.06);
+  --text: #c8c8e0;
+  --text2: #808098;
+  --text3: #505068;
+  --white: #e8e8f8;
+  --accent: #ff6d00;
+  --green: #4caf50;
+  --red: #ef5350;
+  --blue: #2979ff;
+  --yellow: #ffab00;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Noto Sans JP', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.9;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Layout ===== */
+.wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 32px 80px;
+}
+
+/* ===== Header ===== */
+.hero {
+  text-align: center;
+  padding: 60px 0 50px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 50px;
+}
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+.hero-sub {
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 600px;
+  margin: 0 auto;
+}
+.hero-meta {
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* ===== TOC ===== */
+.toc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 50px;
+}
+.toc-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc li {
+  counter-increment: toc;
+  margin-bottom: 6px;
+}
+.toc li::before {
+  content: "0" counter(toc) ".";
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  margin-right: 10px;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+
+/* ===== Sections ===== */
+.section {
+  margin-bottom: 56px;
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+h2 {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--white);
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: var(--accent);
+  margin-top: 10px;
+  margin-bottom: 20px;
+  border-radius: 2px;
+}
+h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--white);
+  margin: 28px 0 12px;
+}
+p { margin-bottom: 14px; }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 18px 0;
+}
+.card-accent {
+  border-left: 3px solid var(--accent);
+}
+.card-green {
+  border-left: 3px solid var(--green);
+}
+.card-blue {
+  border-left: 3px solid var(--blue);
+}
+
+/* ===== Tables ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-bottom: 2px solid rgba(255,255,255,.08);
+  background: var(--bg3);
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+.mono { font-family: var(--mono); }
+.accent { color: var(--accent); font-weight: 700; }
+.green { color: var(--green); }
+.red { color: var(--red); }
+.blue { color: var(--blue); }
+.yellow { color: var(--yellow); }
+.bold { font-weight: 700; color: var(--white); }
+
+/* ===== Flow diagrams ===== */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 20px 0;
+}
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.flow-num {
+  flex: 0 0 36px;
+  height: 36px;
+  background: var(--accent);
+  color: #000;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flow-content {
+  flex: 1;
+  padding-bottom: 24px;
+  border-left: 2px solid rgba(255,109,0,.2);
+  margin-left: -19px;
+  padding-left: 30px;
+}
+.flow-step:last-child .flow-content {
+  border-left-color: transparent;
+}
+.flow-content strong {
+  color: var(--white);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ===== Code ===== */
+code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: rgba(255,255,255,.04);
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--yellow);
+}
+
+.formula-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--yellow);
+  margin: 12px 0;
+  overflow-x: auto;
+  line-height: 1.7;
+}
+
+/* ===== Tags ===== */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.tag-orange { color: var(--accent); background: rgba(255,109,0,.12); }
+.tag-green { color: var(--green); background: rgba(76,175,80,.12); }
+.tag-red { color: var(--red); background: rgba(239,83,80,.12); }
+.tag-blue { color: var(--blue); background: rgba(41,121,255,.12); }
+.tag-gray { color: var(--text2); background: rgba(255,255,255,.06); }
+
+/* ===== Grid ===== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+@media (max-width: 640px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 24px; }
+  .wrapper { padding: 30px 18px 50px; }
+}
+
+/* ===== Divider ===== */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 50px 0;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text3);
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- ========== HERO ========== -->
+<div class="hero">
+  <div class="hero-eyebrow">System Architecture Manual</div>
+  <h1>Earnings Scorecard<br>設計・運用ガイド</h1>
+  <div class="hero-sub">
+    Claudeが四半期決算をどう分析し、スコアリングし、ダッシュボードを生成するか。<br>
+    PLTRで構築した仕組みを他銘柄に横展開するためのブループリント。
+  </div>
+  <div class="hero-meta">v2.1.7 — 2026-03-02 — Built with Claude × CFO</div>
+</div>
+
+<!-- ========== TOC ========== -->
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <ol>
+    <li><a href="#overview">全体アーキテクチャ</a></li>
+    <li><a href="#workflow">「PLTRシグナル」コマンドの裏側</a></li>
+    <li><a href="#kpi">KPIデータベース（9カテゴリ）</a></li>
+    <li><a href="#scoring">スコアリングロジック（3-Tier + 補正）</a></li>
+    <li><a href="#valuation">バリュエーションモデル</a></li>
+    <li><a href="#dashboard">ダッシュボード設計</a></li>
+    <li><a href="#backtest">バックテストと誤判定分析</a></li>
+    <li><a href="#excel">Excel構造マップ</a></li>
+    <li><a href="#expansion">他銘柄への横展開ガイド</a></li>
+    <li><a href="#timeline">四半期タイムライン</a></li>
+  </ol>
+</div>
+
+<!-- ========== 01. OVERVIEW ========== -->
+<div class="section" id="overview">
+  <div class="section-num">01</div>
+  <h2>全体アーキテクチャ</h2>
+  <p>このシステムは<strong class="bold">3つのレイヤー</strong>で構成されます。</p>
+
+  <div class="grid-2">
+    <div class="card card-accent">
+      <strong class="bold">📊 データレイヤー</strong><br>
+      <span style="color:var(--text2)">Excel統合版</span><br>
+      KPI時系列、コンセンサス、バックテスト、バリュエーションモデルを一元管理
+    </div>
+    <div class="card card-accent">
+      <strong class="bold">🧮 ロジックレイヤー</strong><br>
+      <span style="color:var(--text2)">Scoring Engine</span><br>
+      3-Tier スコアリング + バリュエーション補正 + マクロセンチメント補正
+    </div>
+    <div class="card card-accent">
+      <strong class="bold">📱 プレゼンテーション</strong><br>
+      <span style="color:var(--text2)">Live Signal Dashboard</span><br>
+      JSX/HTML/PNG出力 → GitHub Pages自動公開
+    </div>
+    <div class="card card-accent">
+      <strong class="bold">🔄 運用ワークフロー</strong><br>
+      <span style="color:var(--text2)">四半期サイクル</span><br>
+      T-30d → T-7d → T-0 → T+1d の定型プロセス
+    </div>
+  </div>
+</div>
+
+<!-- ========== 02. WORKFLOW ========== -->
+<div class="section" id="workflow">
+  <div class="section-num">02</div>
+  <h2>「PLTRシグナル」コマンドの裏側</h2>
+  <p>ユーザーが「PLTRシグナル」と入力すると、Claudeはバックグラウンドで以下を実行します。</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <strong>Web検索 — リアルタイムデータ取得</strong>
+        PLTRの現在株価、前日比、時価総額を取得。同時にCNN Fear & Greed Indexの最新値と、S&P 500やVIXなどマーケット環境も確認。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <strong>Yahoo Finance Analysis — コンセンサス最新値取得</strong>
+        Yahoo Finance の Analysis ページから最新の EPS Estimate / Revenue Estimate を取得。T-90d 初期値（EPS $0.28 / Rev $1.54B）との差分を Consensus Drift として自動計算。株価急騰・急落時にはアナリストの予想修正が入ることが多く、毎回取得することでドリフトの動きをリアルタイムに捕捉する。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <strong>QoQ株価変動率の計算</strong>
+        現在株価 ÷ 前回決算日終値 - 1 = QoQ変動率。この値がバリュエーション補正（Tier 0）の入力になる。例: $129 ÷ $147.76 = -12.7%
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <strong>スコア計算</strong>
+        Tier 2（トレンド）+ Tier 3（品質）は前回決算で確定済みの値を使用。補正①（バリュエーション）と補正②（マクロF&G）を最新データで再計算。Consensus Driftも最新値で更新。Tier 1のEPS/Rev Beat%のみ決算発表まで「待ち」。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">5</div>
+      <div class="flow-content">
+        <strong>バリュエーション判定</strong>
+        現在株価とBase理論株価（$147）の乖離率から、「割安〜大幅割高」の5段階ゾーンを判定。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">6</div>
+      <div class="flow-content">
+        <strong>ダッシュボード生成（3形式同時出力）</strong>
+        JSX（Reactコンポーネント）、HTML（自己完結型）、PNG（Playwrightスクリーンショット）を同時生成。データは全てハードコードされ、外部API不要で表示可能。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">7</div>
+      <div class="flow-content">
+        <strong>バージョニング＆出力</strong>
+        パッチバージョン+1、Changelog記録。ファイル名: <code>PLTR_LiveSignal_vX.X.X_YYYYMMDD</code>。変更内容サマリーを添えてユーザーに納品。
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <strong class="bold">ユーザーの作業</strong><br>
+    HTMLをダウンロード → GitHubにドラッグ&ドロップ → 自動公開。所要時間: 約2分。
+  </div>
+</div>
+
+<!-- ========== 03. KPI ========== -->
+<div class="section" id="kpi">
+  <div class="section-num">03</div>
+  <h2>KPIデータベース（9カテゴリ）</h2>
+  <p>Q1'22〜Q4'25の16四半期分を蓄積。IR資料・10-K/10-Qから手動収集。</p>
+
+  <table>
+    <tr><th>カテゴリ</th><th>KPI項目</th><th>ソース</th></tr>
+    <tr>
+      <td><span class="tag tag-orange">コンセンサス</span></td>
+      <td>EPS / Revenue の Avg. Estimate、Actual、Beat/Miss%</td>
+      <td>Yahoo Finance</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-orange">売上構造</span></td>
+      <td>Total Revenue、Government / Commercial 分割<br>US Commercial Revenue & YoY成長率</td>
+      <td>Earnings Release</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-green">顧客指標</span></td>
+      <td>Total Customer Count、Net Additions<br>Net Dollar Retention (NDR)</td>
+      <td>Earnings Release</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-green">契約パイプライン</span></td>
+      <td>Remaining Deal Value (RDV)<br>Remaining Performance Obligations (RPO)※開示時</td>
+      <td>10-Q / Earnings Call</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-blue">収益性</span></td>
+      <td>Adj. Operating Margin、GAAP Operating Margin<br>Adj. Operating Income</td>
+      <td>Earnings Release</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-blue">キャッシュフロー</span></td>
+      <td>Adj. Free Cash Flow、FCF Margin<br>Operating Cash Flow</td>
+      <td>Earnings Release</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-red">SBC（希薄化）</span></td>
+      <td>Stock-Based Compensation 金額<br>SBC % of Revenue（希薄化率）</td>
+      <td>10-Q / Earnings Release</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-gray">ガイダンス</span></td>
+      <td>次Q Revenue Guidance (Mid)<br>FY Revenue Guidance (Mid)</td>
+      <td>Earnings Release</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-gray">効率指標</span></td>
+      <td>Rule of 40（Revenue YoY + FCF Margin）<br>GAAP EPS (Diluted)</td>
+      <td>算出値 / 10-Q</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========== 04. SCORING ========== -->
+<div class="section" id="scoring">
+  <div class="section-num">04</div>
+  <h2>スコアリングロジック（3-Tier + 補正）</h2>
+
+  <h3>全体構造</h3>
+  <div class="formula-box">
+Total Score = Tier1 (40pt) + Tier2 (35pt) + Tier3 (25pt) + 補正① (±15pt) + 補正② (±5pt)
+範囲: 理論上 -20 〜 120 / 実用上 0 〜 100
+  </div>
+
+  <h3>Tier 1: サプライズ指標 <span class="tag tag-orange">40pt</span></h3>
+  <p>決算発表時に初めて判明するデータ。Pre-Earningsシグナルでは「?」表示。</p>
+  <table>
+    <tr><th>指標</th><th>配点</th><th>ロジック</th></tr>
+    <tr>
+      <td class="bold">EPS Beat/Miss %</td>
+      <td class="mono">15pt</td>
+      <td>Actual EPS ÷ Consensus EPS - 1<br><span class="green">+10%以上 → 15pt</span>、<span class="red">Miss → 0pt</span>、段階配点</td>
+    </tr>
+    <tr>
+      <td class="bold">Revenue Beat/Miss %</td>
+      <td class="mono">15pt</td>
+      <td>Actual Rev ÷ Consensus Rev - 1<br><span class="green">+3%以上 → 15pt</span>、Beat幅に応じた段階配点</td>
+    </tr>
+    <tr>
+      <td class="bold">Consensus Drift</td>
+      <td class="mono">10pt</td>
+      <td>シグナル生成時にYahoo Finance Analysisから最新Estimateを自動取得し、T-90d初期値との乖離率を算出。上方修正 → 加点、下方修正 → 減点</td>
+    </tr>
+  </table>
+
+  <h3>Tier 2: トレンド加速 <span class="tag tag-orange">35pt</span></h3>
+  <p>前四半期からの「加速度」を測定。絶対値ではなく変化の方向が重要。</p>
+  <table>
+    <tr><th>指標</th><th>配点</th><th>ロジック</th></tr>
+    <tr>
+      <td class="bold">NDR QoQ変化</td>
+      <td class="mono">10pt</td>
+      <td>Net Dollar Retention の前期比変化<br>上昇 → 加点、低下 → 減点</td>
+    </tr>
+    <tr>
+      <td class="bold">Revenue 加速度</td>
+      <td class="mono">10pt</td>
+      <td>Revenue YoY Growth の QoQ差分<br>加速 → 加点、減速 → 減点</td>
+    </tr>
+    <tr>
+      <td class="bold">Margin QoQ改善</td>
+      <td class="mono">10pt</td>
+      <td>Adj. Operating Margin の前期比改善幅<br>改善 → 加点、悪化 → 減点</td>
+    </tr>
+    <tr>
+      <td class="bold">US Commercial YoY</td>
+      <td class="mono">5pt</td>
+      <td>US Commercial Revenue の YoY成長率<br>高成長 → 加点</td>
+    </tr>
+  </table>
+
+  <h3>Tier 3: 構造品質 <span class="tag tag-orange">25pt</span></h3>
+  <p>ビジネスの「質」を評価。一時的な好決算と構造的な強さを区別する。</p>
+  <table>
+    <tr><th>指標</th><th>配点</th><th>ロジック</th></tr>
+    <tr>
+      <td class="bold">SBC % Revenue</td>
+      <td class="mono">8pt</td>
+      <td>SBC ÷ Revenue。低いほど株主フレンドリー<br><span class="green">15%以下 → 8pt</span>、<span class="red">30%超 → 0pt</span></td>
+    </tr>
+    <tr>
+      <td class="bold">FCF Margin</td>
+      <td class="mono">8pt</td>
+      <td>Adj. FCF ÷ Revenue。キャッシュ創出力<br><span class="green">30%超 → 8pt</span>、<span class="red">マイナス → 0pt</span></td>
+    </tr>
+    <tr>
+      <td class="bold">Rule of 40</td>
+      <td class="mono">9pt</td>
+      <td>Revenue YoY% + FCF Margin%<br><span class="green">80超 → 9pt</span>、<span class="red">40未満 → 0pt</span></td>
+    </tr>
+  </table>
+
+  <h3>補正①: バリュエーション過熱度 <span class="tag tag-blue">±15pt</span></h3>
+  <p>決算前のQoQ株価変動率で過熱/売られすぎを補正。</p>
+  <div class="formula-box">
+QoQ = 現在株価 ÷ 前回決算日終値 - 1
+
++40%超 → -5pt（過熱警戒）
++20〜40% → -3pt
+-20〜+20% → 0pt（中立）
+-40〜-20% → +3pt
+-40%以下 → +5pt（売られすぎ）
+  </div>
+  <div class="card card-blue">
+    <strong class="bold">なぜ必要か？</strong><br>
+    Q1'25の教訓：全KPI好調で60pt級でも、QoQ+40%超の過熱状態では-9%下落。バリュエーション補正なしでは過熱シグナルを捉えられない。
+  </div>
+
+  <h3>補正②: マクロF&G <span class="tag tag-green">±5pt</span></h3>
+  <p>CNN Fear & Greed Index（T-7d値）で市場センチメントを反映。</p>
+  <div class="formula-box">
+F&G ≤ 24（Extreme Fear）→ +5pt
+F&G 25-44（Fear）      → +2pt
+F&G 45-55（Neutral）   →  0pt
+F&G 56-74（Greed）     → -2pt
+F&G ≥ 75（Extreme Greed）→ -5pt
+  </div>
+
+  <h3>シグナル判定</h3>
+  <table>
+    <tr><th>スコア</th><th>シグナル</th><th>意味</th></tr>
+    <tr><td class="mono bold">55+</td><td><span class="tag tag-red">強気 BULLISH</span></td><td>高確率で好決算 → 積極的にポジション構築</td></tr>
+    <tr><td class="mono bold">40-54</td><td><span class="tag tag-orange">やや強気 LEAN BULL</span></td><td>好材料が優勢 → 決算内容を見て追加判断</td></tr>
+    <tr><td class="mono bold">25-39</td><td><span class="tag tag-gray">中立 NEUTRAL</span></td><td>判断材料不足 → 静観</td></tr>
+    <tr><td class="mono bold">&lt;25</td><td><span class="tag tag-blue">やや弱気 LEAN BEAR</span></td><td>悪材料が優勢 → ポジション縮小を検討</td></tr>
+  </table>
+</div>
+
+<!-- ========== 05. VALUATION ========== -->
+<div class="section" id="valuation">
+  <div class="section-num">05</div>
+  <h2>バリュエーションモデル</h2>
+  <p>2つのアプローチを組み合わせて多面的に評価します。</p>
+
+  <h3>① Reverse DCF — 市場が織り込む成長率の逆算</h3>
+  <div class="card card-accent">
+    <strong class="bold">問い: 現在のEVを正当化するには、何年間何%の成長が必要か？</strong>
+  </div>
+  <div class="formula-box">
+【前提】
+WACC（割引率）: 10%
+Terminal Growth Rate: 3%
+Terminal EV/Revenue Multiple: 12x
+Projection Period: 7年
+
+【逆算】
+ターミナル年必要Revenue = EV × (1+WACC)^7 ÷ Terminal Multiple
+★織込みCAGR = (ターミナルRev ÷ 現在Rev)^(1/7) - 1
+
+【判定】
+織込みCAGR > ガイダンス → 市場が過剰な成長を期待 → 割高圧力
+織込みCAGR < ガイダンス → 成長を十分評価していない → 割安余地
+  </div>
+
+  <h3>② FCF Fair Value — 3シナリオ理論株価</h3>
+  <p>FCFの成長フェーズを3段階に分けて将来キャッシュフローを投影。</p>
+  <table>
+    <tr><th></th><th><span class="blue">Bear</span></th><th><span class="bold">Base</span></th><th><span class="accent">Bull</span></th></tr>
+    <tr><td>Phase 1 (3年)</td><td class="mono">30%</td><td class="mono">40%</td><td class="mono">50%</td></tr>
+    <tr><td>Phase 2 (2年)</td><td class="mono">18%</td><td class="mono">25%</td><td class="mono">35%</td></tr>
+    <tr><td>Phase 3 (1年)</td><td class="mono">12%</td><td class="mono">18%</td><td class="mono">25%</td></tr>
+    <tr><td>Terminal Multiple</td><td class="mono">22x</td><td class="mono">28x</td><td class="mono">35x</td></tr>
+    <tr><td class="bold">★ 理論株価</td><td class="mono blue">$85</td><td class="mono bold">$147</td><td class="mono accent">$263</td></tr>
+  </table>
+
+  <div class="formula-box">
+Fair Value = (Σ FCF_t / (1+WACC)^t + Terminal Value) / 発行株式数 + Cash per Share
+  </div>
+
+  <h3>追加指標</h3>
+  <table>
+    <tr><th>指標</th><th>算出方法</th><th>意図</th></tr>
+    <tr>
+      <td class="bold">Forward P/E</td>
+      <td>株価 ÷ FY27E Adj EPS<br><span style="color:var(--text2)">FY27E = FY26 Adj OI × (1+Base Phase1成長率) ÷ 発行株式数</span></td>
+      <td>Trailing P/Eだけでは割高に見えすぎる。FY27E（finviz慣行）で圧縮ストーリーを可視化</td>
+    </tr>
+    <tr>
+      <td class="bold">PEG Ratio</td>
+      <td>Forward P/E ÷ FY25→FY27E EPS CAGR%</td>
+      <td>成長率対比の割安度。ただし高成長期はCAGRが大きくPEGが人工的に低くなるため<span class="yellow">要注意</span></td>
+    </tr>
+    <tr>
+      <td class="bold">FCF Yield</td>
+      <td>FY26E FCF ÷ 時価総額</td>
+      <td>キャッシュフローベースの利回り</td>
+    </tr>
+  </table>
+
+  <h3>バリュエーション・ゾーン判定</h3>
+
+  <div class="card card-blue">
+    <strong class="bold">毎回更新されるもの vs 四半期でのみ更新されるもの</strong><br><br>
+    理論株価（Bear $85 / Base $147 / Bull $263）は<strong class="accent">四半期決算ごとに更新</strong>されます。DCFモデルの入力値（ガイダンスFCF、成長率前提、Cash、発行株式数）が決算発表で変わるまでは固定です。<br><br>
+    一方、「PLTRシグナル」を実行するたびに<strong class="green">毎回更新される</strong>のは以下です:
+    <table style="margin-top:12px">
+      <tr><th>毎回更新（リアルタイム）</th><th>四半期決算で更新</th></tr>
+      <tr>
+        <td>
+          現在株価 → QoQ変動率<br>
+          F&G Index → マクロ補正<br>
+          コンセンサス（EPS/Rev Est.）→ Drift<br>
+          乖離率（株価 vs Base）→ ゾーン判定
+        </td>
+        <td>
+          FY Guided FCF（DCF入力）<br>
+          Phase成長率前提（必要時に見直し）<br>
+          Terminal Multiple（同上）<br>
+          Cash / 発行株式数（BS更新）<br>
+          <span class="accent">→ 理論株価が再計算される</span>
+        </td>
+      </tr>
+    </table>
+    <span style="color:var(--text2);font-size:13px">つまり、シグナルを途中で見た場合は「固定のBase $147に対して、今の株価がどこにいるか」が動く形です。決算間でBase前提を見直したい場合は、Claudeに依頼すればモデルを再計算できます。</span>
+  </div>
+  <table>
+    <tr><th>Base乖離</th><th>ゾーン</th><th>色</th></tr>
+    <tr><td class="mono">&gt; +50%</td><td>大幅割高</td><td><span class="tag tag-red">赤</span></td></tr>
+    <tr><td class="mono">&gt; +20%</td><td>割高</td><td><span class="tag tag-red">赤</span></td></tr>
+    <tr><td class="mono">&gt; -10%</td><td>適正</td><td><span class="tag tag-gray">灰</span></td></tr>
+    <tr><td class="mono">&gt; -30%</td><td>やや割安</td><td><span class="tag tag-green">緑</span></td></tr>
+    <tr><td class="mono">≤ -30%</td><td>割安</td><td><span class="tag tag-green">緑</span></td></tr>
+  </table>
+</div>
+
+<!-- ========== 06. DASHBOARD ========== -->
+<div class="section" id="dashboard">
+  <div class="section-num">06</div>
+  <h2>ダッシュボード設計</h2>
+
+  <h3>レイアウト構成</h3>
+  <div class="card" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--text2)">
+    <span class="accent">[Header]</span> ティッカー / LIVE SIGNAL / vX.X.X &nbsp;&nbsp;&nbsp; 株価 / 前日比%<br>
+    <span class="accent">[Top Row]</span> EARNINGS T-XX | PRE-SIGNAL XX/100 シグナル名 | VALUATION ZONE<br>
+    <span class="accent">[Gauges]</span> F&G Index | QoQ Stock Δ | 織込みCAGR | FCF Yield<br>
+    <span class="accent">[Two-Col]</span> SCORE BREAKDOWN (5本バー) | VALUATION DETAIL (定規 + 指標)<br>
+    <span class="accent">[Metrics]</span> P/E(TTM) | Fwd P/E | MKT Cap | PT Avg | Q1 EPS | Q1 Rev | FCF Yld<br>
+    <span class="accent">[Judgment]</span> シグナル × ゾーン → 統合判断テキスト<br>
+    <span class="accent">[Actions]</span> T-XX日ごとのアクションリスト<br>
+    <span class="accent">[Footer]</span> バージョン情報
+  </div>
+
+  <h3>フォントサイズ体系（v2.1.7）</h3>
+  <table>
+    <tr><th>要素</th><th>サイズ</th><th>例</th></tr>
+    <tr><td>大見出し数値</td><td class="mono">38-42px</td><td>T-75、スコア54</td></tr>
+    <tr><td>ゾーンラベル</td><td class="mono">28px</td><td>やや割安</td></tr>
+    <tr><td>ゲージ数値</td><td class="mono">26px</td><td>37, 41, 1.3</td></tr>
+    <tr><td>メトリクスカード値</td><td class="mono">21px</td><td>205x, $308B</td></tr>
+    <tr><td>統合判断</td><td class="mono">17px</td><td>やや強気 × やや割安 →...</td></tr>
+    <tr><td>アクション</td><td class="mono">15px</td><td>T-7日 — F&G再取得...</td></tr>
+    <tr><td>本文・バー名</td><td class="mono">14px</td><td>Tier 2: トレンド加速</td></tr>
+    <tr><td>セクションラベル</td><td class="mono">13px</td><td>SCORE BREAKDOWN</td></tr>
+  </table>
+
+  <h3>出力形式</h3>
+  <table>
+    <tr><th>形式</th><th>用途</th><th>技術</th></tr>
+    <tr><td class="bold">.jsx</td><td>Claude Artifacts内で表示</td><td>React + Tailwind不使用 + インラインスタイル</td></tr>
+    <tr><td class="bold">.html</td><td>GitHub Pages公開・ブラウザ表示</td><td>自己完結HTML（CSS内包、外部依存なし）</td></tr>
+    <tr><td class="bold">.png</td><td>SNS共有・記録</td><td>Playwright → viewport 920px → content heightトリム</td></tr>
+  </table>
+</div>
+
+<!-- ========== 07. BACKTEST ========== -->
+<div class="section" id="backtest">
+  <div class="section-num">07</div>
+  <h2>バックテストと誤判定分析</h2>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <div style="font-size:36px;font-weight:900;color:var(--green);font-family:var(--mono)">88%</div>
+      <div style="color:var(--text2);margin-top:4px">方向一致率（14/16四半期）</div>
+    </div>
+    <div class="card card-accent">
+      <div style="font-size:36px;font-weight:900;color:var(--accent);font-family:var(--mono)">16Q</div>
+      <div style="color:var(--text2);margin-top:4px">バックテスト期間（Q1'22〜Q4'25）</div>
+    </div>
+  </div>
+
+  <h3>Y値の定義</h3>
+  <div class="formula-box">
+Y = 翌営業日始値 ÷ 決算日終値 - 1
+  </div>
+  <p>決算発表後の市場初動反応を捉える。+なら好反応、-なら悪反応。</p>
+
+  <h3>判定基準</h3>
+  <table>
+    <tr><th>記号</th><th>条件</th></tr>
+    <tr><td class="green bold">◎ 的中</td><td>シグナル方向とY値の方向が一致（強気→+、弱気→-）</td></tr>
+    <tr><td class="yellow bold">○ 概ね的中</td><td>方向は一致するが小幅（Y値の絶対値が3%未満）</td></tr>
+    <tr><td class="red bold">× 誤判定</td><td>シグナルと逆方向の結果</td></tr>
+  </table>
+
+  <h3>誤判定の構造分析</h3>
+  <div class="card card-accent">
+    <strong class="bold">Q4'22: やや弱気 → +14.4%</strong>（×）<br>
+    GAAP黒字化転換という「レジーム変化」が発生。後ろ向きKPIでは構造変化を捉えられない。<br>
+    <span class="accent">→ 教訓: 定性判断（GAAP転換等）の併用が必要</span>
+  </div>
+  <div class="card card-accent">
+    <strong class="bold">Q1'25: 強気 → -8.7%</strong>（×）<br>
+    全KPI好調（Tier1-3で60pt級）だが、FYガイダンスが市場期待を下回った。<br>
+    <span class="accent">→ 教訓: ガイダンス変数の追加が必要（P1タスク）</span>
+  </div>
+</div>
+
+<!-- ========== 08. EXCEL ========== -->
+<div class="section" id="excel">
+  <div class="section-num">08</div>
+  <h2>Excel構造マップ</h2>
+  <p>全データは <code>PLTR_決算チェック_統合版.xlsx</code> に集約。</p>
+
+  <table>
+    <tr><th>シート名</th><th>内容</th><th>行数</th></tr>
+    <tr><td class="bold">Guide</td><td>7セクションの使い方ガイド</td><td class="mono">113</td></tr>
+    <tr><td class="bold">Scorecard v2</td><td>メインスコアカード + バックテスト + Q1'26プレイブック</td><td class="mono">90</td></tr>
+    <tr><td class="bold">Valuation</td><td>Reverse DCF + FCF Fair Value（青字セルで前提変更→自動再計算）</td><td class="mono">90</td></tr>
+    <tr><td class="bold">Model Input</td><td>コンセンサス＋KPI統合データ（予測モデル用）</td><td class="mono">77</td></tr>
+    <tr><td class="bold">KPI Dashboard</td><td>9カテゴリKPI時系列（Q1'22〜Q4'25）</td><td class="mono">88</td></tr>
+    <tr><td class="bold">Source Tracker</td><td>17Q分のデータソースURL</td><td class="mono">83</td></tr>
+    <tr><td class="bold">収集チェックリスト</td><td>四半期ごとのデータ収集手順</td><td class="mono">22</td></tr>
+    <tr><td class="bold">Changelog</td><td>v2.1.4〜v2.1.7の変更履歴</td><td class="mono">5</td></tr>
+  </table>
+
+  <h3>Valuation Sheet 構造</h3>
+  <div class="card" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--text2)">
+    <span class="accent">Row 5-9</span> &nbsp; 市場データ（株価, 発行株式数, 時価総額, Cash, EV）<br>
+    <span class="accent">Row 12-16</span> FY25実績（Rev, FCF, NI, Adj OI, EPS）<br>
+    <span class="accent">Row 19-23</span> マルチプル（EV/Rev, EV/FCF, P/E, FCF Yield）<br>
+    <span class="accent">Row 26-31</span> FY26ガイダンス（Rev, Growth, Adj OI, FCF）<br>
+    <span class="green">Row 37-40</span> DCF前提 ← <span class="yellow">青字変更可</span><br>
+    <span class="accent">Row 43-46</span> Reverse DCF結果 → ★織込みCAGR<br>
+    <span class="green">Row 54-59</span> FCF Fair Value前提 ← <span class="yellow">青字変更可</span><br>
+    <span class="accent">Row 62-68</span> FCFプロジェクション FY26-32<br>
+    <span class="accent">Row 71-77</span> DCF計算 → ★理論株価（Bear/Base/Bull）<br>
+    <span class="accent">Row 80-82</span> バリュエーション・ゾーン判定
+  </div>
+</div>
+
+<!-- ========== 09. EXPANSION ========== -->
+<div class="section" id="expansion">
+  <div class="section-num">09</div>
+  <h2>他銘柄への横展開ガイド</h2>
+
+  <h3>そのまま使える要素</h3>
+  <table>
+    <tr><th>要素</th><th>汎用性</th><th>備考</th></tr>
+    <tr><td class="bold">Tier 1: サプライズ</td><td><span class="tag tag-green">高</span></td><td>EPS/Rev Beat%とConsensus Driftはどの銘柄でも適用可</td></tr>
+    <tr><td class="bold">Tier 3: 構造品質</td><td><span class="tag tag-green">高</span></td><td>SBC%, FCF Margin, Rule of 40 は SaaS全般で有効</td></tr>
+    <tr><td class="bold">補正①: バリュエーション</td><td><span class="tag tag-green">高</span></td><td>QoQ株価変動率はユニバーサル</td></tr>
+    <tr><td class="bold">補正②: マクロF&G</td><td><span class="tag tag-green">高</span></td><td>市場全体のセンチメント。銘柄非依存</td></tr>
+    <tr><td class="bold">Reverse DCF</td><td><span class="tag tag-green">高</span></td><td>前提パラメータを変えるだけ</td></tr>
+    <tr><td class="bold">FCF Fair Value</td><td><span class="tag tag-green">高</span></td><td>Phase成長率とTerminal Multipleを銘柄ごとに設定</td></tr>
+    <tr><td class="bold">ダッシュボード</td><td><span class="tag tag-green">高</span></td><td>データ差し替えだけで別銘柄に転用可</td></tr>
+  </table>
+
+  <h3>銘柄ごとにカスタマイズが必要な要素</h3>
+  <table>
+    <tr><th>要素</th><th>理由</th><th>対応方針</th></tr>
+    <tr>
+      <td class="bold">Tier 2: トレンド加速</td>
+      <td>NDRやUS Commercialは PLTR固有KPI</td>
+      <td>銘柄のキードライバーに置換。例: AWS → リージョン数、NVDA → データセンター売上</td>
+    </tr>
+    <tr>
+      <td class="bold">Forward P/E 算出基準</td>
+      <td>Adj OI vs GAAP NI の選択は企業のプロファイルによる</td>
+      <td>黒字企業はGAAP EPS、高成長は Adj ベース</td>
+    </tr>
+    <tr>
+      <td class="bold">スコア閾値</td>
+      <td>ボラティリティの大小で反応幅が異なる</td>
+      <td>バックテストN≥8で閾値調整</td>
+    </tr>
+  </table>
+
+  <h3>横展開の手順</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <strong>対象銘柄のKPI特定</strong>
+        IR資料を読み、株価を動かす3-5個のキードライバーを特定。Tier 2の4指標をこれに置換。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <strong>過去8Q以上のデータ収集</strong>
+        Yahoo Finance（コンセンサス）+ IR資料（KPI）+ 10-Q（財務）から時系列データを構築。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <strong>バックテスト実施</strong>
+        Tier配点を仮設定 → 8Q以上でバックテスト → 方向一致率75%以上を目指す → 閾値調整。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <strong>バリュエーションモデル構築</strong>
+        Excelテンプレートをコピー → 株価・財務データ・成長率前提を差し替え → DCF自動再計算。
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">5</div>
+      <div class="flow-content">
+        <strong>ダッシュボード生成</strong>
+        Claudeに「[ティッカー]シグナル」→ 株価・F&G・Yahoo Financeコンセンサスを自動取得し、データ差し替え版を生成 → GitHub Pagesで公開。
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <strong class="bold">推定所要時間（2銘柄目以降）</strong><br>
+    KPI特定: 1時間 → データ収集: 2-3時間 → バックテスト+調整: Claude と 1セッション → ダッシュボード: 自動生成<br>
+    <span class="accent">初回（PLTR）で仕組みを構築済みなので、2銘柄目からは大幅に速くなります。</span>
+  </div>
+</div>
+
+<!-- ========== 10. TIMELINE ========== -->
+<div class="section" id="timeline">
+  <div class="section-num">10</div>
+  <h2>四半期タイムライン</h2>
+
+  <table>
+    <tr><th>タイミング</th><th>アクション</th><th>詳細</th></tr>
+    <tr>
+      <td class="bold">T-90日</td>
+      <td>コンセンサス初期値記録</td>
+      <td>Yahoo Finance → EPS/Rev Avg. Estimate記録。Drift計測の基準点</td>
+    </tr>
+    <tr>
+      <td class="bold">T-30日</td>
+      <td>中間ドリフト確認</td>
+      <td>コンセンサスの変化方向を確認。上方修正 or 下方修正トレンドを把握</td>
+    </tr>
+    <tr>
+      <td class="bold">T-7日</td>
+      <td>最終補正確定</td>
+      <td>F&G Index取得 → マクロ補正確定。QoQ株価確定 → バリュエーション補正確定。「PLTRシグナル」で最終Pre-Earnings版を生成</td>
+    </tr>
+    <tr>
+      <td class="bold">T-1日</td>
+      <td>コンセンサス最終値</td>
+      <td>Yahoo Financeの最終EPS/Rev Estimateを確定。Tier 1 Drift最終値</td>
+    </tr>
+    <tr>
+      <td class="bold accent">T-0日</td>
+      <td>決算発表</td>
+      <td>Actual EPS/Rev入力 → Tier 1確定 → 最終スコア算出 → ポジション判断</td>
+    </tr>
+    <tr>
+      <td class="bold">T+1日</td>
+      <td>結果検証</td>
+      <td>翌日始値を記録 → Y値算出 → バックテスト更新 → シグナル精度検証</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div class="footer">
+  <div style="margin-bottom:8px">
+    <span class="tag tag-orange">Earnings Scorecard System</span>
+    <span class="tag tag-gray">v2.1.7</span>
+  </div>
+  Built with Claude × CFO — 2026
+</div>
+
+</div><!-- /wrapper -->
+</body>
+</html>
