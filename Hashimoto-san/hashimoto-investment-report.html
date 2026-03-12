@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>橋本雅治 投資戦略レポート 2025-2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;900&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #06090F;
+  --bg-card: #0D1117;
+  --bg-card-hover: #161B22;
+  --border: #1C2333;
+  --border-light: #2A3444;
+  --gold: #C8A24E;
+  --gold-dim: #A08030;
+  --gold-glow: rgba(200,162,78,0.12);
+  --green: #2EA043;
+  --green-dim: rgba(46,160,67,0.15);
+  --red: #DA3633;
+  --red-dim: rgba(218,54,51,0.15);
+  --blue: #388BFD;
+  --purple: #A371F7;
+  --orange: #D29922;
+  --text: #E6EDF3;
+  --text-dim: #8B949E;
+  --text-muted: #6E7681;
+  --sidebar-w: 280px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;font-size:17px;}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.75;
+  overflow-x:hidden;
+}
+
+/* ─── Sidebar ─── */
+.sidebar{
+  position:fixed;top:0;left:0;
+  width:var(--sidebar-w);height:100vh;
+  background:var(--bg-card);
+  border-right:1px solid var(--border);
+  z-index:100;
+  display:flex;flex-direction:column;
+  transition:transform .3s;
+}
+.sidebar-header{
+  padding:28px 24px 20px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-header h1{
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;font-weight:600;
+  color:var(--gold);letter-spacing:.02em;
+  line-height:1.4;
+}
+.sidebar-header p{
+  font-size:.75rem;color:var(--text-muted);margin-top:6px;
+  letter-spacing:.06em;
+}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 0;}
+.sidebar-nav a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 24px;font-size:.88rem;
+  color:var(--text-dim);text-decoration:none;
+  transition:all .2s;border-left:2px solid transparent;
+}
+.sidebar-nav a:hover,.sidebar-nav a.active{
+  color:var(--gold);background:var(--gold-glow);
+  border-left-color:var(--gold);
+}
+.sidebar-nav .nav-group{
+  padding:20px 24px 6px;font-size:.72rem;
+  color:var(--text-muted);letter-spacing:.12em;
+  text-transform:uppercase;font-weight:600;
+}
+.sidebar-nav .nav-icon{
+  width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+  font-size:.82rem;opacity:.7;
+}
+.sidebar-footer{
+  padding:16px 24px;border-top:1px solid var(--border);
+  font-size:.72rem;color:var(--text-muted);line-height:1.5;
+}
+
+/* ─── Mobile Toggle ─── */
+.menu-toggle{
+  display:none;position:fixed;top:14px;left:14px;z-index:200;
+  background:var(--bg-card);border:1px solid var(--border);
+  color:var(--gold);width:40px;height:40px;border-radius:8px;
+  font-size:1.1rem;cursor:pointer;
+}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .menu-toggle{display:flex;align-items:center;justify-content:center;}
+  .main{margin-left:0!important;width:100%!important;}
+}
+
+/* ─── Main ─── */
+.main{
+  margin-left:var(--sidebar-w);
+  width:calc(100% - var(--sidebar-w));
+  min-height:100vh;
+}
+section{
+  padding:60px 48px 80px;
+  border-bottom:1px solid var(--border);
+  max-width:1100px;
+  animation:fadeUp .6s ease-out both;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ─── Typography ─── */
+.section-label{
+  display:inline-block;padding:3px 14px;
+  border:1px solid var(--gold);border-radius:20px;
+  font-size:.75rem;color:var(--gold);
+  letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:16px;
+}
+h2{
+  font-family:'Playfair Display',serif;
+  font-size:2.1rem;font-weight:700;
+  color:var(--text);line-height:1.35;
+  margin-bottom:8px;
+}
+h2 span{color:var(--gold);}
+h3{
+  font-size:1.25rem;font-weight:600;
+  color:var(--text);margin:32px 0 12px;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+h4{
+  font-size:1.08rem;font-weight:600;
+  color:var(--gold);margin:24px 0 10px;
+}
+.subtitle{color:var(--text-dim);font-size:.95rem;margin-bottom:32px;}
+p{margin-bottom:14px;color:var(--text-dim);font-size:.95rem;}
+p.body-text{color:#BCC5D0;font-size:1rem;line-height:1.85;}
+strong{color:var(--text);font-weight:600;}
+
+/* ─── Cards ─── */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:28px 0;
+}
+.kpi{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:18px 16px;text-align:center;
+  transition:border-color .2s;
+}
+.kpi:hover{border-color:var(--gold-dim);}
+.kpi-label{font-size:.8rem;color:var(--text-muted);margin-bottom:6px;letter-spacing:.05em;}
+.kpi-value{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:700;color:var(--gold);}
+.kpi-sub{font-size:.75rem;color:var(--text-muted);margin-top:4px;}
+@media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ─── Charts ─── */
+.chart-container{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+  padding:24px;margin:20px 0;
+}
+.chart-container h4{margin-top:0;margin-bottom:16px;border:none;}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+@media(max-width:800px){.chart-row{grid-template-columns:1fr;}}
+
+/* ─── Tables ─── */
+.phase-block{margin:36px 0;}
+.phase-title{
+  font-size:1.12rem;font-weight:700;color:var(--text);
+  margin-bottom:6px;padding-left:14px;
+  border-left:3px solid var(--gold);
+}
+.phase-summary{
+  font-size:.95rem;color:var(--text-dim);margin:10px 0 16px;
+  line-height:1.8;
+}
+.phase-insight{
+  background:var(--gold-glow);border-left:3px solid var(--gold);
+  padding:12px 18px;border-radius:0 8px 8px 0;
+  margin:12px 0 18px;font-size:.92rem;color:#C8B060;
+  font-style:italic;line-height:1.7;
+}
+table{
+  width:100%;border-collapse:collapse;font-size:.9rem;
+}
+thead th{
+  background:#151B25;color:var(--text-muted);
+  padding:10px 12px;text-align:left;font-weight:600;
+  font-size:.8rem;letter-spacing:.06em;
+  text-transform:uppercase;border-bottom:1px solid var(--border);
+}
+tbody td{
+  padding:9px 12px;border-bottom:1px solid var(--border);
+  color:var(--text-dim);vertical-align:top;
+}
+tbody tr:hover{background:var(--bg-card-hover);}
+.tag{
+  display:inline-block;padding:1px 8px;border-radius:4px;
+  font-size:.78rem;font-weight:700;letter-spacing:.03em;
+}
+.tag-buy{background:var(--green-dim);color:var(--green);}
+.tag-sell{background:var(--red-dim);color:var(--red);}
+.tag-shift{background:rgba(200,162,78,.15);color:var(--gold);}
+.tag-win{background:rgba(163,113,247,.12);color:var(--purple);}
+.tag-info{background:rgba(139,148,158,.1);color:var(--text-muted);}
+
+/* ─── Philosophy ─── */
+.principle{
+  margin:36px 0;padding:28px;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;transition:border-color .3s;
+}
+.principle:hover{border-color:var(--gold-dim);}
+.principle-num{
+  font-family:'Playfair Display',serif;font-size:2rem;
+  font-weight:700;color:var(--gold);opacity:.6;
+  float:left;margin-right:16px;line-height:1;
+}
+.principle-title{
+  font-size:1.15rem;font-weight:700;color:var(--text);
+  margin-bottom:10px;
+}
+.principle p{font-size:.95rem;color:var(--text-dim);line-height:1.8;}
+.quote-box{
+  background:rgba(200,162,78,.06);border-left:3px solid var(--gold-dim);
+  padding:14px 18px;border-radius:0 8px 8px 0;
+  margin:14px 0;
+}
+.quote-box .quote-text{
+  font-size:.95rem;color:#C8B060;font-style:italic;line-height:1.7;margin:0;
+}
+.quote-box .quote-date{
+  font-size:.78rem;color:var(--text-muted);margin-top:6px;text-align:right;
+}
+.evidence{
+  background:rgba(56,139,253,.06);border-left:3px solid var(--blue);
+  padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;
+}
+.evidence-label{font-size:.8rem;font-weight:700;color:var(--blue);margin-bottom:4px;}
+.evidence p{font-size:.9rem;color:var(--text-dim);margin:0;line-height:1.7;}
+
+/* ─── Analysis ─── */
+.insight-card{
+  margin:28px 0;padding:24px 28px;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;border-top:3px solid var(--gold);
+}
+.insight-card h4{margin-top:0;border:none;padding:0;}
+.insight-card p{font-size:.95rem;line-height:1.85;}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted);}
+
+/* ─── Portfolio Legend ─── */
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:12px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.82rem;color:var(--text-muted);}
+.legend-dot{width:10px;height:10px;border-radius:2px;}
+
+/* ─── Holdings Grid ─── */
+.holdings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+@media(max-width:700px){.holdings-grid{grid-template-columns:1fr;}}
+.holding-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:18px 20px;
+}
+.holding-card h4{margin:0 0 8px;font-size:1rem;}
+.holding-card p{font-size:.9rem;margin:0;line-height:1.7;}
+
+/* ─── Framework ─── */
+.framework-steps{
+  display:flex;flex-direction:column;gap:2px;margin:20px 0;
+}
+.fw-step{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 18px;background:var(--bg-card);
+  border:1px solid var(--border);border-radius:8px;
+}
+.fw-step-num{
+  font-family:'Playfair Display',serif;font-size:1.3rem;
+  font-weight:700;color:var(--gold);opacity:.5;min-width:28px;
+}
+.fw-step-title{font-weight:600;color:var(--text);font-size:.98rem;}
+.fw-step p{font-size:.9rem;color:var(--text-dim);margin:4px 0 0;}
+
+/* ─── Pie legend ─── */
+.pie-legend{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+.pie-item{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--text-dim);}
+.pie-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.pie-val{margin-left:auto;font-weight:600;color:var(--text);}
+
+/* ─── Print ─── */
+@media print{
+  .sidebar,.menu-toggle{display:none!important;}
+  .main{margin-left:0!important;width:100%!important;}
+  section{padding:30px 20px;break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>橋本雅治<br>Investment Report</h1>
+    <p>2025.03 — 2026.03</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">Dashboard</div>
+    <a href="#dashboard"><span class="nav-icon">📊</span>ポートフォリオ概要</a>
+
+    <div class="nav-group">Timeline Report</div>
+    <a href="#timeline-overview"><span class="nav-icon">📋</span>エグゼクティブサマリー</a>
+    <a href="#phase1"><span class="nav-icon">①</span>関税暴落への逆張り</a>
+    <a href="#phase2"><span class="nav-icon">②</span>利確とコモディティシフト</a>
+    <a href="#phase3"><span class="nav-icon">③</span>金銀上昇と目標達成</a>
+    <a href="#phase4"><span class="nav-icon">④</span>年間80.5%と2026年の布陣</a>
+    <a href="#holdings"><span class="nav-icon">💎</span>主要保有銘柄の変遷</a>
+
+    <div class="nav-group">Philosophy</div>
+    <a href="#philosophy-intro"><span class="nav-icon">🧠</span>投資哲学の全体像</a>
+    <a href="#p1"><span class="nav-icon">1</span>暴落は最大の買い場</a>
+    <a href="#p2"><span class="nav-icon">2</span>割高を感知したら即売り</a>
+    <a href="#p3"><span class="nav-icon">3</span>確信度に比例した集中投資</a>
+    <a href="#p4"><span class="nav-icon">4</span>地政学からテーマ導出</a>
+    <a href="#p5"><span class="nav-icon">5</span>常に次を先回り</a>
+    <a href="#p6"><span class="nav-icon">6</span>元金回収で負けない状態</a>
+    <a href="#p7"><span class="nav-icon">7</span>暴落の構造分析</a>
+    <a href="#p8"><span class="nav-icon">8</span>起業家の目利き力</a>
+    <a href="#framework"><span class="nav-icon">🔄</span>思考フレームワーク</a>
+
+    <div class="nav-group">Cross Analysis</div>
+    <a href="#analysis"><span class="nav-icon">🔗</span>投資哲学 × 税制提言書</a>
+  </nav>
+  <div class="sidebar-footer">
+    LINE「投資とベンチャー会」の発言記録に基づく<br>
+    投資は自己責任です
+  </div>
+</aside>
+
+<div class="main">
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<section id="dashboard">
+  <div class="section-label">Portfolio Dashboard</div>
+  <h2>橋本雅治 <span>投資戦略</span> ダッシュボード</h2>
+  <p class="subtitle">2025年3月 — 2026年3月 | 年間利回り80.5%、13ヶ月で資金2倍を実現</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">2025年利回り</div>
+      <div class="kpi-value">+80.5%</div>
+      <div class="kpi-sub">目標30%を大幅超過</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">2026年1月</div>
+      <div class="kpi-value">+30%</div>
+      <div class="kpi-sub">1ヶ月で年間目標達成</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">13ヶ月リターン</div>
+      <div class="kpi-value">2倍</div>
+      <div class="kpi-sub">資金を倍増</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">金銀シフト利益</div>
+      <div class="kpi-value">+$115万</div>
+      <div class="kpi-sub">8月→12月の4ヶ月間</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h4>ポートフォリオ配分の変遷</h4>
+    <canvas id="allocationChart" height="110"></canvas>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#C8A24E"></div>金・銀・コモディティ</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#388BFD"></div>米国株</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#A371F7"></div>債券</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2EA043"></div>新興国+日本株</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D29922"></div>暗号通貨</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <h4>累計リターン推移</h4>
+      <canvas id="returnChart" height="140"></canvas>
+    </div>
+    <div class="chart-container">
+      <h4>最新ポートフォリオ（2026/03）</h4>
+      <canvas id="pieChart" height="140"></canvas>
+      <div class="pie-legend">
+        <div class="pie-item"><div class="pie-dot" style="background:#C8A24E"></div>金・銀・銅・プラチナ<span class="pie-val">48%</span></div>
+        <div class="pie-item"><div class="pie-dot" style="background:#388BFD"></div>米株(炭鉱/ロボ/エネ/宇宙)<span class="pie-val">18%</span></div>
+        <div class="pie-item"><div class="pie-dot" style="background:#2EA043"></div>新興国+日本株<span class="pie-val">8%</span></div>
+        <div class="pie-item"><div class="pie-dot" style="background:#A371F7"></div>債券<span class="pie-val">5%</span></div>
+        <div class="pie-item"><div class="pie-dot" style="background:#D29922"></div>暗号通貨<span class="pie-val">5%</span></div>
+        <div class="pie-item"><div class="pie-dot" style="background:#6E7681"></div>キャッシュ<span class="pie-val">16%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ TIMELINE ═══════════ -->
+<section id="timeline-overview">
+  <div class="section-label">Investment Timeline</div>
+  <h2>投資判断 <span>タイムライン</span> レポート</h2>
+  <p class="subtitle">4つのフェーズに分けた全投資判断の時系列記録</p>
+
+  <h3>エグゼクティブサマリー</h3>
+  <p class="body-text">本レポートは、BRUNO創業者・橋本雅治氏がLINEグループ「投資とベンチャー会」において2025年3月から2026年3月までに共有した投資判断、銘柄選定、ポートフォリオ変更を時系列で網羅的に整理したものである。</p>
+  <p class="body-text">橋本氏は2025年に年間利回り80.5%（目標30%）を達成。2025年4月のトランプ関税暴落時に全力買いした米株を7〜8月に+35%で利確し、そのキャッシュを金・銀へ大胆にシフトさせた判断が最大の成功要因となった。8月から12月の4ヶ月間で金銀だけで+115万ドル（約1.7億円）の利益を生み出している。</p>
+  <p class="body-text">2026年に入っても勢いは衰えず、1月だけで年間目標の30%を達成。13ヶ月で運用資金を2倍にするという驚異的な成果を収めている。直近では銅への参入、エネルギー株（カメコ/CCJ）への注目など、コモディティ中心の戦略を継続しつつ新たなテーマを開拓している。</p>
+</section>
+
+<section id="phase1">
+  <div class="phase-block">
+    <div class="phase-title">第1フェーズ: トランプ関税暴落への逆張り（2025年3月〜5月）</div>
+    <p class="phase-summary">市場がパニックに陥る中、橋本氏は冷静にキャッシュを全投入。ARM、MPマテリアル、Amazonを中心に15銘柄以上を一気に仕込む。金は最高値更新中も継続保有。米国債は全売却しドル持高を削減。</p>
+    <div class="phase-insight">「予想通りの展開だが底か更に落ちるかは予想がつかない。余力を残しながら買いに行ってください」— 暴落局面での冷静さと、リスク管理を両立させるアドバイス。</div>
+    <table>
+      <thead><tr><th>日付</th><th>種別</th><th>判断内容</th></tr></thead>
+      <tbody>
+        <tr><td>2025/03/31</td><td><span class="tag tag-info">分析</span></td><td>金が最高値更新、「今週仕込み時」と宣言。ライザップ(チョコザップ)のリスクを指摘</td></tr>
+        <tr><td>2025/04/03</td><td><span class="tag tag-buy">買い</span></td><td>関税発動で米株時間外大幅下落→ARM,MPマテリアル,Amazon,Uber,ServiceNow等の下値拾い開始</td></tr>
+        <tr><td>2025/04/05</td><td><span class="tag tag-buy">買い</span></td><td>保有キャッシュ全投入。翌週は米国債売却して追加購入を宣言</td></tr>
+        <tr><td>2025/04/15</td><td><span class="tag tag-info">情報</span></td><td>MPマテリアル21%高。ゴールドマンが金目標$3,700。保有TOP3: ARM/MPマテリアル/Amazon</td></tr>
+        <tr><td>2025/04/17</td><td><span class="tag tag-buy">買い</span></td><td>MSFT, Google購入。為替見通しを140円→130円に変更（ドルの信任低下）</td></tr>
+        <tr><td>2025/04/19</td><td><span class="tag tag-sell">売り</span></td><td>米国債全て売却→ドル持高削減</td></tr>
+        <tr><td>2025/04/23</td><td><span class="tag tag-sell">売り</span></td><td>NVDA $95で買い戻し→$99で売却。NVDAの独占崩壊リスクを判断</td></tr>
+        <tr><td>2025/04/26</td><td><span class="tag tag-info">情報</span></td><td>保有銘柄公開: ARM,MP,Amazon,MSFT,GOOGLE,Uber,NOW,AVGO,ASML等15銘柄</td></tr>
+        <tr><td>2025/05/07</td><td><span class="tag tag-win">達成</span></td><td>HIMSダブルバガー達成（4月仕込み）</td></tr>
+        <tr><td>2025/05/08</td><td><span class="tag tag-win">達成</span></td><td>いつも社ダブルバガー達成(755円)。TikTok Shop効果でストップ高連続</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="phase2">
+  <div class="phase-block">
+    <div class="phase-title">第2フェーズ: 利確とコモディティシフト（2025年6月〜8月）</div>
+    <p class="phase-summary">米株の利益が+20〜35%に達した段階で段階的に利確を開始。8月にはAI半導体株を大量売却し、そのキャッシュを金・銀に大胆にシフト。シラー指数が暴落前水準に達しているとの判断。VIX最安値更新時にVIX先物も購入。</p>
+    <div class="phase-insight">「一番上がる要素の強い分野にポートフォリオを大きくシフトさせなくてどうやって資産を増やすのだろう」— 常識的な分散投資論を否定し、確信度の高い方向に集中投資。</div>
+    <table>
+      <thead><tr><th>日付</th><th>種別</th><th>判断内容</th></tr></thead>
+      <tbody>
+        <tr><td>2025/06/05</td><td><span class="tag tag-info">情報</span></td><td>保有金額TOP10公開。SPDR GOLD +50%超、Silver +30%。コモディティ好調</td></tr>
+        <tr><td>2025/06/11</td><td><span class="tag tag-sell">売り</span></td><td>米株利益+20%超→50%利確/50%中長期保有のルール適用</td></tr>
+        <tr><td>2025/07/18</td><td><span class="tag tag-sell">売り</span></td><td>米株+35%→本格的に売りに入る。金銀暗号通貨は引き続き保有</td></tr>
+        <tr><td>2025/08/20</td><td><span class="tag tag-shift">転換</span></td><td>コモディティ比率大幅増。Gold26%,Silver8%。インドETF減。いつも社/トライアル買い増し</td></tr>
+        <tr><td>2025/08/25</td><td><span class="tag tag-buy">買い</span></td><td>シラー指数が暴落前水準→米株比率さらに低下。VIX年内最安値→6,000株購入</td></tr>
+        <tr><td>2025/08/25</td><td><span class="tag tag-shift">転換</span></td><td>シルバー最有望と結論→利確中止・買い増し。VANECK GOLD MINERS 70%利益で7割利確</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="phase3">
+  <div class="phase-block">
+    <div class="phase-title">第3フェーズ: 金銀本格上昇と目標達成（2025年9月〜10月）</div>
+    <p class="phase-summary">金銀へのシフトが大成功し、9月に年間目標30%を3ヶ月前倒しで達成。AI銘柄は完全売却し、炭鉱株・ロボット・宇宙関連にシフト。量子コンピュータは短期参入後に即撤退する判断力も発揮。SBG社債(年利8.25%)も購入。</p>
+    <div class="phase-insight">「割高なものは少しのショックで暴落する。何月というよりは今の株価が割高と感じているので売却した」— タイミング予測ではなくバリュエーション判断で売却を決定。</div>
+    <table>
+      <thead><tr><th>日付</th><th>種別</th><th>判断内容</th></tr></thead>
+      <tbody>
+        <tr><td>2025/09/07</td><td><span class="tag tag-sell">売り</span></td><td>米株ほぼ全売却(利益+35%)。ARM/Amazon等全売却。金銀持高を倍増</td></tr>
+        <tr><td>2025/09/15</td><td><span class="tag tag-win">達成</span></td><td>年間目標利回り30%を3ヶ月残して達成。「暴落待ちスタンス」に移行</td></tr>
+        <tr><td>2025/09/15</td><td><span class="tag tag-info">情報</span></td><td>欧州軍需ETF(STOXX AEROSPACE & DEFENCE)推奨。NATO防衛費GDP5%対応</td></tr>
+        <tr><td>2025/09/27</td><td><span class="tag tag-shift">転換</span></td><td>AI銘柄売却完了→炭鉱株・ロボット株関連にシフト。目標40%に上方修正</td></tr>
+        <tr><td>2025/10/01</td><td><span class="tag tag-buy">買い</span></td><td>銀の炭鉱株ETFに大量投資。「金の再評価シナリオ」に注目</td></tr>
+        <tr><td>2025/10/14</td><td><span class="tag tag-win">達成</span></td><td>MPマテリアル4thバガー。銀相場が1980年以来の最高値更新</td></tr>
+        <tr><td>2025/10/15</td><td><span class="tag tag-shift">転換</span></td><td>AI関連利確→金銀/炭鉱株/量子/宇宙/ロボットAI株に分散</td></tr>
+        <tr><td>2025/10/20</td><td><span class="tag tag-sell">売り</span></td><td>量子コンピュータ(RGTI,QBTS)即撤退。「危険な感じがする」</td></tr>
+        <tr><td>2025/10/23</td><td><span class="tag tag-buy">買い</span></td><td>SBG社債(年利8.25%、2065年満期)購入。10年で利息82%</td></tr>
+        <tr><td>2025/10/30</td><td><span class="tag tag-info">情報</span></td><td>パフォーマンスTOP5公開: TER/RKLB/IDCC/FORM/COHR</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="phase4">
+  <div class="phase-block">
+    <div class="phase-title">第4フェーズ: 年間80.5%達成と2026年の布陣（2025年11月〜2026年3月）</div>
+    <p class="phase-summary">年間利回り50%→80.5%で着地。8月からの金銀シフトで+115万ドルの驚異的成果。2026年は銅への新規参入、エネルギー株への注目など新たなテーマを開拓。1月だけで年間目標30%を達成し、13ヶ月で資金2倍を実現。</p>
+    <div class="phase-insight">「トランプ政権の間は中国が仕掛ける鉱物戦争とアメリカの鉱物防衛の出資等が重なり、鉱物&鉱山企業の上昇は続く」— 地政学的マクロ分析から投資テーマを導出。3月には「イラン情勢より雇用統計の悪化が不気味。年内リセッション入り」とし、地政学を副次要因、実体経済の構造悪化を本質と見る二層構造の分析を展開。</div>
+    <table>
+      <thead><tr><th>日付</th><th>種別</th><th>判断内容</th></tr></thead>
+      <tbody>
+        <tr><td>2025/11/27</td><td><span class="tag tag-buy">買い</span></td><td>11月調整後にAMD,ARM,BKNG,CCJ,FLNC買い戻し</td></tr>
+        <tr><td>2025/12/12</td><td><span class="tag tag-win">達成</span></td><td>年間利回り50%達成。ハイテク株少し買い戻し(Google,MSFT,Netflix,ARM)</td></tr>
+        <tr><td>2025/12/15</td><td><span class="tag tag-buy">買い</span></td><td>META,AVGO,VRT購入。現在は炭鉱株/ロボット/エネルギー分野メイン</td></tr>
+        <tr><td>2025/12/26</td><td><span class="tag tag-win">達成</span></td><td>8月以降の金銀シフトで+115万ドル(約1.7億円)</td></tr>
+        <tr><td>2026/01/07</td><td><span class="tag tag-win">達成</span></td><td>2025年利回り80.5%確定。2026年もゴールド・シルバー軸の運用継続</td></tr>
+        <tr><td>2026/01/17</td><td><span class="tag tag-buy">買い</span></td><td>銅関連(COPX/SCCO/FCX)大量購入。銅は出遅れと判断</td></tr>
+        <tr><td>2026/01/22</td><td><span class="tag tag-win">達成</span></td><td>2026年1月で年間目標30%達成。13ヶ月で資金2倍</td></tr>
+        <tr><td>2026/01/28</td><td><span class="tag tag-sell">売り</span></td><td>銀が購入時の4倍→25%売却で元金回収</td></tr>
+        <tr><td>2026/01/31</td><td><span class="tag tag-buy">買い</span></td><td>金銀大暴落(4要因分析)→中期トレンド不変と判断→キャッシュ全投入</td></tr>
+        <tr><td>2026/02/13</td><td><span class="tag tag-win">達成</span></td><td>トライアルとサンリオがそれぞれストップ高（各社との業務提携交渉中に企業分析→買いと判断し事前購入）</td></tr>
+        <tr><td>2026/02/26</td><td><span class="tag tag-shift">転換</span></td><td>AI半導体株売り→金鉱株/AIロボット/エネルギー/宇宙に絞る</td></tr>
+        <tr><td>2026/03/03</td><td><span class="tag tag-info">情報</span></td><td>イラン空爆→エネルギー戦略と分析。カメコ(CCJ)有望と判断</td></tr>
+        <tr><td>2026/03/09</td><td><span class="tag tag-info">情報</span></td><td>イラン情勢より雇用統計悪化が不気味。年内に米リセッション入りを予測、本格暴落は5月以降と見る</td></tr>
+        <tr><td>2026/03/09</td><td><span class="tag tag-sell">売り</span></td><td>コモディティは十分保有で買い増し不要。株式は売り減らし継続。イラン戦争の短期収束時が株式の利確タイミング。コモディティは暴落時まで保有継続、暴騰すれば半分利確</td></tr>
+        <tr><td>2026/03/10</td><td><span class="tag tag-sell">売り</span></td><td>AVGO(ブロードコム)売却。今年の米株は悲観的。継続保有はバガー銘柄のみ: FSLY(4倍),TER/MP(3倍),COHR/FORM/HL(2倍)。4倍・3倍は元金回収済み</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="holdings">
+  <h3>主要保有銘柄・資産の変遷</h3>
+  <div class="holdings-grid">
+    <div class="holding-card">
+      <h4>コモディティ（最大配分）</h4>
+      <p>SPDR GOLD TRUST, iShares Silver Trust, VANECK GOLD MINERS, 銀鉱株ETF, 銅関連(COPX/SCCO/FCX), プラチナ。2025年8月以降ポートフォリオの40〜48%を占める中核資産。</p>
+    </div>
+    <div class="holding-card">
+      <h4>米国個別株（テーマ株）</h4>
+      <p>炭鉱株: MP Materials, WPM, KGC, SA, RGLD, ODV, HL。ロボット: TER。エネルギー: CCJ。宇宙: RKLB。AI半導体: AMD, ARM（縮小中）。FANG: Google, MSFT。※2026年3月時点：AVGO等の有望株も売却し、バガー銘柄のみ残す方針。現在保有のバガー銘柄 — フォースバガー(4倍): FSLY、トリプルバガー(3倍): TER / MP、ダブルバガー(2倍): COHR / FORM / HL。フォースバガーとトリプルバガーは元金回収済み。安定有望株は暴落時に買い戻す戦略。</p>
+    </div>
+    <div class="holding-card">
+      <h4>日本株</h4>
+      <p>いつも社: TikTok Shop関連で急騰、ダブルバガー達成。トライアルHD・サンリオ: 各社と業務提携交渉中に企業分析し購入→それぞれストップ高。</p>
+    </div>
+    <div class="holding-card">
+      <h4>債券・暗号通貨</h4>
+      <p>SBG ハイブリッド外債（年利8.25%、2065年満期）。暗号通貨は2018年に300万円→2025年に2,800万円。ポートフォリオの約5%。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PHILOSOPHY ═══════════ -->
+<section id="philosophy-intro">
+  <div class="section-label">Investment Philosophy</div>
+  <h2>橋本雅治の <span>投資哲学</span></h2>
+  <p class="subtitle">13ヶ月で資金2倍を実現した8つの原則と思考フレームワーク</p>
+  <p class="body-text">本セクションは、橋本雅治氏がLINEグループにて約1年間にわたり発信した投資関連の発言・判断を分析し、その投資哲学と思考フレームワークを体系的に整理したものである。各原則には、実際のLINE発言からの根拠と具体的な投資行動を付記している。</p>
+</section>
+
+<section id="p1">
+  <div class="principle">
+    <div class="principle-num">01</div>
+    <div class="principle-title">暴落は最大の買い場であり、恐怖は味方である</div>
+    <p>橋本氏の投資行動で最も顕著な特徴は、市場がパニックに陥った瞬間に全力で買い向かう姿勢である。2025年4月のトランプ関税暴落時、多くの投資家が狼狽売りする中、橋本氏は保有キャッシュを全投入し、さらに米国債を売却してまで追加購入に充てた。</p>
+    <p>重要なのは、闇雲に買うのではなく「底が読めないことを認めた上で、余力を残しながら買う」という冷静なリスク管理を同時に実践している点である。</p>
+    <div class="quote-box">
+      <p class="quote-text">「予想通りの展開ですが、今日が底か更に落ちるかは予想がつきません。なので買うにしても余力を残しながら買いにいってください。」</p>
+      <div class="quote-date">— 2025年4月3日</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>4月暴落時にARM,MPマテリアル,Amazon等15銘柄を仕込み→7月に+35%で利確。この単一の判断だけでも年間目標の大半をカバーした。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p2">
+  <div class="principle">
+    <div class="principle-num">02</div>
+    <div class="principle-title">割高を感知したら躊躇なく売る</div>
+    <p>橋本氏は「何月に暴落するか」というタイミング予測ではなく、「現在の価格が割高かどうか」というバリュエーション判断で売却を決定する。シラー指数が暴落前水準に達した時点で米株の大半を売却した判断は、まさにこの原則の体現である。</p>
+    <p>利益が乗った状態での売却判断は心理的に最も難しい局面だが、「50%を利確、50%を中長期保有」というルールを設け、感情を排除した意思決定を行っている。</p>
+    <div class="quote-box">
+      <p class="quote-text">「何月というよりは今の株価が割高と感じているので売却しました。割高なものは少しのショックで暴落すると思います。」</p>
+      <div class="quote-date">— 2025年9月15日</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>8月にシラー指数を根拠にAI半導体株を大量売却→10月以降のAI株軟調を回避。NVDAは$95買→$99売と短期で判断変更。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p3">
+  <div class="principle">
+    <div class="principle-num">03</div>
+    <div class="principle-title">確信度の高い方向に集中投資する</div>
+    <p>一般的な投資指南が「金はポートフォリオの10%以内に」と説く中、橋本氏はコモディティを40〜48%まで引き上げた。調査と分析に裏打ちされた確信があるからこそ可能な戦略であり、「分散投資」の常識に真っ向から反する。</p>
+    <div class="quote-box">
+      <p class="quote-text">「投資指南者が盛んに金で値上がり益を狙うな、ポートフォリオ10%以内にという情報を垂れ流してますが何を言ってるのかなという感じです。一番上がる要素の強い分野にポートフォリオを大きくシフトさせなくてどうやって資産を増やすのだろう」</p>
+      <div class="quote-date">— 2026年1月7日</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>8月に米株売却→金銀にシフト。4ヶ月で+115万ドル（約1.7億円）。コモディティ集中投資が年間80.5%リターンの最大の貢献要因。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p4">
+  <div class="principle">
+    <div class="principle-num">04</div>
+    <div class="principle-title">マクロの地政学から投資テーマを導出する</div>
+    <p>橋本氏の銘柄選定は個別企業のファンダメンタルズ分析だけでなく、地政学的なマクロ分析から始まる。トランプ関税、中国のレアアース規制、イラン空爆、NATO防衛費増額など、国際情勢の動きを投資テーマに直結させている。</p>
+    <p>特に「中国が仕掛ける鉱物戦争」というフレームワークは、金・銀・銅・レアアースへの投資判断の根幹をなしている。</p>
+    <div class="quote-box">
+      <p class="quote-text">「イラン空爆は表向きは核開発阻止ですが狙いはエネルギーだと思います。中国の主な石油輸入元であるベネズエラとイランを叩き、石油輸入ルート二つを封じました。4月の首脳会談でトランプは石油を交渉材料とするでしょう。」</p>
+      <div class="quote-date">— 2026年3月3日</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>中国レアアース規制→MPマテリアル4倍。NATO防衛費増→欧州軍需ETF推奨。イラン空爆→カメコ(CCJ)有望判断。すべて地政学分析が起点。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p5">
+  <div class="principle">
+    <div class="principle-num">05</div>
+    <div class="principle-title">「次」を常に先回りする</div>
+    <p>発言を時系列で追うと、常に市場コンセンサスの1〜2手先を行っていることがわかる。2023-24年はNVIDIAで稼ぎ、2025年前半はAI半導体→後半は金銀→2026年は銅・エネルギーと、テーマの切り替えが的確である。</p>
+    <p>量子コンピュータ株に参入後すぐに「危険な感じがする」と撤退した判断も、「次」を追いつつリスクを感知したら即座に引く柔軟性を示している。</p>
+    <div class="quote-box">
+      <p class="quote-text">「次のエヌビディアはAMDのような気がしています。AI関連はAMD1本に絞りました。NVIDIAは伸びしろよりも急落のリスクの方が高い」</p>
+      <div class="quote-date">— 2025年10月 / 2026年1月</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>2025年: AI半導体→金銀→炭鉱株。2026年: 銅参入→エネルギー(CCJ)注目。量子コンピュータは参入2週間で撤退。常に半歩先。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p6">
+  <div class="principle">
+    <div class="principle-num">06</div>
+    <div class="principle-title">元金回収で「負けない状態」を作る</div>
+    <p>大きく利益が乗った段階で元金分を回収し、以降は「利益だけで勝負する」状態を作る。銀が4倍になった段階で25%を売却して元金回収したのは典型的な例である。これにより残りのポジションは心理的にフリーとなり、より大胆な運用が可能になる。</p>
+    <div class="quote-box">
+      <p class="quote-text">「銀が購入時の4倍になりましたので25%を指値で売却し元金回収します。」</p>
+      <div class="quote-date">— 2026年1月28日</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>銀: 4倍で25%売却→元金回収。2026年3月時点の保有バガー銘柄: FSLY(4倍)・TER/MP(3倍)は元金回収済みで「負けない状態」、COHR/FORM/HL(2倍)はさらなる上昇を狙う。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p7">
+  <div class="principle">
+    <div class="principle-num">07</div>
+    <div class="principle-title">暴落の構造を分析し、反転の根拠を持って再参入する</div>
+    <p>2026年1月末の金銀大暴落時、橋本氏は即座に4つの要因を分析し、「中期的な上昇トレンドは変わらない」と結論づけた上でキャッシュを全投入した。パニック時に冷静に構造分析できるのは、日頃からマクロ環境を深く理解しているからこそである。</p>
+    <div class="quote-box">
+      <p class="quote-text">「金銀の大暴落の要因は4点。①Microsoft暴落による損失穴埋め売り、②レバレッジ投資家の強制売り、③次期FRB議長タカ派人選、④地政学リスク低下。4つが重なったが中期的な上昇トレンドは変わらない。」</p>
+      <div class="quote-date">— 2026年1月31日</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>暴落翌日に4要因を構造化→来週月曜にキャッシュ全投入を宣言→その後金銀は反発。4月暴落時も同様の分析で+35%獲得。</p>
+    </div>
+  </div>
+</section>
+
+<section id="p8">
+  <div class="principle">
+    <div class="principle-num">08</div>
+    <div class="principle-title">起業家の目利き力を投資に活かす</div>
+    <p>橋本氏はBRUNO創業者であり、現在も複数企業の取締役・顧問として事業に深く関わっている。この事業家としての視座が投資判断に独自の優位性を与えている。</p>
+    <p>いつも社のTikTok Shop展開は橋本氏自身がセッティングしたアライアンスであり、事業の内側から成長性を確信した上での投資。ライザップの退店率リスクはリアルビジネスの現場感覚から導出された見通しだった。</p>
+    <div class="quote-box">
+      <p class="quote-text">「TikTokショップは6月に始まったばかりでこれから本格的に拡大が始まります。」</p>
+      <div class="quote-date">— 2025年9月7日（いつも社について）</div>
+    </div>
+    <div class="evidence">
+      <div class="evidence-label">実例</div>
+      <p>いつも社: 自身がアライアンスをセッティング→ストップ高連続→ダブルバガー。ライザップ: 退店率>入会率を予測→3月に売却推奨→後に業績悪化。</p>
+    </div>
+  </div>
+</section>
+
+<section id="framework">
+  <h3>思考フレームワークの全体像</h3>
+  <p class="body-text">橋本氏の投資判断プロセスを統合すると、以下の循環的フレームワークとして理解できる。</p>
+  <div class="framework-steps">
+    <div class="fw-step">
+      <div class="fw-step-num">1</div>
+      <div>
+        <div class="fw-step-title">マクロ環境分析</div>
+        <p>地政学、金融政策、資源動向を常にウォッチし、大きなテーマ（コモディティスーパーサイクル、中国鉱物戦争、AI電力需要等）を抽出する。</p>
+      </div>
+    </div>
+    <div class="fw-step">
+      <div class="fw-step-num">2</div>
+      <div>
+        <div class="fw-step-title">バリュエーション判断</div>
+        <p>現在の市場価格がテーマに対して割高か割安かを判断する。シラー指数等の定量指標と、事業家としての定性的な肌感覚を組み合わせる。</p>
+      </div>
+    </div>
+    <div class="fw-step">
+      <div class="fw-step-num">3</div>
+      <div>
+        <div class="fw-step-title">ポジション構築</div>
+        <p>確信度に応じてサイズを決定。確信が高ければ40〜50%の集中投資も辞さない。暴落時は全力買い、割高時は躊躇なく利確。</p>
+      </div>
+    </div>
+    <div class="fw-step">
+      <div class="fw-step-num">4</div>
+      <div>
+        <div class="fw-step-title">リスク管理</div>
+        <p>元金回収ルール、50%利確ルール、VIX先物によるヘッジなど、複数の手法を組み合わせて「負けない状態」を維持する。</p>
+      </div>
+    </div>
+    <div class="fw-step">
+      <div class="fw-step-num">5</div>
+      <div>
+        <div class="fw-step-title">次のテーマへの移行</div>
+        <p>現在のテーマの成熟度を見極め、次のテーマ（AI半導体→金銀→銅→エネルギー）へ先回りする。</p>
+      </div>
+    </div>
+  </div>
+  <p class="body-text" style="margin-top:24px;">橋本氏の投資哲学の本質は、<strong>「確信を持てる領域に大胆に集中し、確信が薄れたら躊躇なく撤退する」</strong>という極めてシンプルな原則にある。その確信は、地政学的マクロ分析と事業家としての現場感覚の両方から構築されており、一般的な投資家が持ち得ない独自の情報優位性（エッジ）となっている。</p>
+</section>
+
+<!-- ═══════════ CROSS ANALYSIS ═══════════ -->
+<section id="analysis">
+  <div class="section-label">Cross Analysis</div>
+  <h2>投資哲学 × <span>税制提言書</span></h2>
+  <p class="subtitle">「tax_reform_proposal_v6」と投資行動の構造的関連性から得られる示唆</p>
+
+  <p class="body-text">橋本氏が高市総理宛に提出した税制提言書「民間主導の資金循環促進に向けた税制改革案」は、1年間限定の贈与税完全撤廃と恒久的な相続税・贈与税一律20%への引き下げを提言するものである。この提言書と1年間の投資記録を重ねて読むと、両者が同一の思想体系から生まれていることが明らかになる。</p>
+
+  <div class="insight-card">
+    <h4>示唆1: 「死蔵マネー」への怒りが両方の原点</h4>
+    <p>税制提言書の核心は「1,100兆円の現預金が高齢者に滞留し、経済を回していない」という問題意識である。一方、LINEでの投資行動を見ると、橋本氏自身がまさにその「死蔵」の対極を体現している。暴落時に米国債を売却してまで全力買いし、割高と判断すれば躊躇なく金銀にシフトし、13ヶ月で資金2倍にした。</p>
+    <p><strong>提言書は「日本全体が橋本雅治のように資金を動かせば経済は回る」と言っているに等しく、提言者自身の投資行動がそのまま提言の実証例になっている。</strong></p>
+  </div>
+
+  <div class="insight-card">
+    <h4>示唆2: 「取れない55%」と「割高＝暴落リスク」の構造的アナロジー</h4>
+    <p>提言書で最も鋭い指摘は「取れない55%」vs「確実に回る20%」というラッファーカーブの論理である。投資哲学を見ると、橋本氏はまったく同じ構造認識を持っている。シラー指数が割高水準に達した時の判断は「割高なものは少しのショックで暴落する」だった。</p>
+    <p><strong>税制でも投資でも「無理に高い水準を維持すると、かえって全体のリターンが消失する」という構造を見抜いている。相続税55%が「課税そのものの消失」を招くのと、割高株価が「暴落による利益消失」を招くのは、まったく同じメカニズムである。</strong></p>
+  </div>
+
+  <div class="insight-card">
+    <h4>示唆3: 「コモディティシフト」と「現金→実物資産への移転」の整合性</h4>
+    <p>橋本氏の投資の最大の成功要因は、2025年8月の「株→金銀」への大胆なシフトだった。提言書の本質も「現金預金→消費・投資への移転」である。両方とも「ペーパーアセットや現金に滞留させるのは非効率であり、実物・実需のある先に資金を動かすべきだ」という信念が通底している。</p>
+    <p><strong>投資指南者の「金はポートフォリオの10%以内に」という常識を一蹴するのと、「相続税55%が国際標準だ」という固定観念を否定するのは、まったく同じ思考パターンである。</strong></p>
+  </div>
+
+  <div class="insight-card">
+    <h4>示唆4: 提言書の説得力を補強する「ミクロの実証データ」</h4>
+    <p>提言書の「220兆円が市場に投下される」という試算は、マクロ推計としてはやや大胆である。しかし、LINEの投資記録は「実際にキャッシュを果敢に動かした個人が年間80.5%のリターンを得た」という生の実証例を提供している。</p>
+    <p><strong>橋本氏が「死蔵マネーを動かす」ことの経済的リターンを自分の資金で証明している。「ミクロの実証→マクロへの敷衍」というロジックは、提言書の最も効果的な補強材料となり得る。</strong></p>
+  </div>
+
+  <div class="insight-card">
+    <h4>示唆5: 地政学認識が税制改革の「緊急性」を裏付ける</h4>
+    <p>LINEで橋本氏は「中国の鉱物戦争」「イランの石油封鎖」「ドルの信認低下」といった地政学リスクを常に分析し、コモディティに集中投資している。この世界観と税制提言書を重ねると、「日本が国際的な資本誘致競争で後れを取っている」という危機感が浮かび上がる。</p>
+    <p><strong>シンガポール・ドバイへのキャピタルフライトの問題は、まさに地政学的な資本争奪戦の一部である。橋本氏自身が海外市場で年間80.5%を稼いでいるという事実は、裏を返せば「その資金とノウハウが日本国内で循環していない」という提言書の問題提起そのものである。</strong></p>
+  </div>
+
+  <div class="insight-card" style="border-top-color:var(--red);">
+    <h4>最新動向（2026年3月9日）: リセッション予測と出口戦略</h4>
+    <p>イラク爆撃・ホルムズ海峡封鎖・NFP -9.2万人・原油$100目前という混乱の中、橋本氏は<strong>「イラン情勢より雇用統計の悪化の方が不気味」</strong>と、市場の注目（地政学）とは異なるポイントに焦点を当てた。年内に米経済がリセッション入りすると予測し、本格的な暴落は5月以降と見ている。</p>
+    <p>具体的な行動指針として、コモディティは「十分保有しており買い増しは行わない」、株式は「売り減らしを継続」と明言。出口設計は二段構え：<strong>「イラン戦争が短期で収束すればそこが株式の利確タイミング」</strong>、そしてコモディティについては<strong>「暴落時まで保有継続し、暴騰すれば半分利確」</strong>という規律である。</p>
+    <p>この判断は投資哲学の複数の原則を同時に体現している。株式は原則2「割高を感知したら躊躇なく売る」（地政学リスク後退による反発を出口にする）。コモディティは原則6「元金回収で負けない状態を作る」（暴騰時に半分利確し残りをフリーで運用）。そして全体を貫くのは原則7「暴落の構造を分析する」（表層の地政学リスクではなく、実体経済の構造悪化を本質と見る二層構造の分析）。<strong>目の前の恐怖（イラン戦争）に惑わされず、本質的なリスク（雇用悪化→リセッション）を見据える冷静さが、橋本氏の判断の真骨頂である。</strong></p>
+  </div>
+
+  <h3>総括</h3>
+  <p class="body-text">税制提言書は橋本雅治の投資哲学を「国家レベルの政策」にスケールアップしたものと読める。個人レベルでは<strong>「割高を避け、確信のある方向に集中し、資金を死蔵させない」</strong>。国家レベルでは<strong>「高すぎる税率を是正し、死蔵マネーを解放し、実体経済に資金を循環させる」</strong>。同一の思想が、ポートフォリオ運用と税制設計の両方に表現されている。</p>
+
+  <p style="color:var(--text-muted);font-size:.82rem;margin-top:40px;padding-top:16px;border-top:1px solid var(--border);">
+    免責事項: 本ドキュメントは教育・研究目的で作成されたものであり、投資助言を構成するものではありません。投資判断は自己責任で行ってください。
+  </p>
+</section>
+
+</div><!-- /main -->
+
+<script>
+// ─── Sidebar Active State ───
+const navLinks=document.querySelectorAll('.sidebar-nav a');
+const sections=document.querySelectorAll('section');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const a=document.querySelector(`.sidebar-nav a[href="#${e.target.id}"]`);
+      if(a)a.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>observer.observe(s));
+
+// Close sidebar on mobile nav click
+navLinks.forEach(l=>l.addEventListener('click',()=>{
+  document.querySelector('.sidebar').classList.remove('open');
+}));
+
+// ─── Charts ───
+const chartDefaults={
+  color:'#8B949E',
+  borderColor:'#1C2333',
+  font:{family:'Noto Sans JP',size:11}
+};
+Chart.defaults.color=chartDefaults.color;
+Chart.defaults.font.family=chartDefaults.font.family;
+Chart.defaults.font.size=13;
+
+// Allocation Stacked Area
+new Chart(document.getElementById('allocationChart'),{
+  type:'line',
+  data:{
+    labels:['4月','6月','7月','8月','9月','10月','11月','12月','1月','2月','3月'],
+    datasets:[
+      {label:'金・銀・コモディティ',data:[35,40,35,34,40,40,42,45,45,45,48],backgroundColor:'rgba(200,162,78,0.6)',borderColor:'#C8A24E',fill:true,tension:.3,pointRadius:0},
+      {label:'米国株',data:[30,30,25,15,15,20,22,25,25,20,18],backgroundColor:'rgba(56,139,253,0.5)',borderColor:'#388BFD',fill:true,tension:.3,pointRadius:0},
+      {label:'債券',data:[15,10,10,5,5,10,8,5,5,5,5],backgroundColor:'rgba(163,113,247,0.4)',borderColor:'#A371F7',fill:true,tension:.3,pointRadius:0},
+      {label:'新興国+日本株',data:[15,15,15,12,10,10,8,8,8,8,8],backgroundColor:'rgba(46,160,67,0.4)',borderColor:'#2EA043',fill:true,tension:.3,pointRadius:0},
+      {label:'暗号通貨',data:[5,5,15,10,10,5,5,5,5,5,5],backgroundColor:'rgba(210,153,34,0.4)',borderColor:'#D29922',fill:true,tension:.3,pointRadius:0},
+    ]
+  },
+  options:{
+    responsive:true,
+    scales:{
+      x:{grid:{color:'#1C2333'}},
+      y:{stacked:true,max:100,grid:{color:'#1C2333'},ticks:{callback:v=>v+'%'}}
+    },
+    plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}}
+  }
+});
+
+// Cumulative Return
+new Chart(document.getElementById('returnChart'),{
+  type:'line',
+  data:{
+    labels:['4月','5月','6月','7月','8月','9月','10月','11月','12月','1月','2月','3月'],
+    datasets:[{
+      label:'累計リターン',
+      data:[0,10,17,25,32,42,52,60,80,110,118,125],
+      borderColor:'#2EA043',backgroundColor:'rgba(46,160,67,0.08)',
+      fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#2EA043'
+    }]
+  },
+  options:{
+    responsive:true,
+    scales:{
+      x:{grid:{color:'#1C2333'}},
+      y:{grid:{color:'#1C2333'},ticks:{callback:v=>'+'+v+'%'}}
+    },
+    plugins:{legend:{display:false}}
+  }
+});
+
+// Pie Chart
+new Chart(document.getElementById('pieChart'),{
+  type:'doughnut',
+  data:{
+    labels:['金・銀・銅・プラチナ','米株','新興国+日本','債券','暗号通貨','キャッシュ'],
+    datasets:[{
+      data:[48,18,8,5,5,16],
+      backgroundColor:['#C8A24E','#388BFD','#2EA043','#A371F7','#D29922','#6E7681'],
+      borderWidth:0,hoverOffset:8
+    }]
+  },
+  options:{
+    responsive:true,cutout:'55%',
+    plugins:{legend:{display:false}}
+  }
+});
+</script>
+
+</body>
+</html>
