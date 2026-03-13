@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025Q4 決算シーズン総括</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0c0f14;
+    --surface: #141921;
+    --surface2: #1a2230;
+    --border: #252d3a;
+    --text: #e2e8f0;
+    --text-dim: #7a8ba0;
+    --text-muted: #4a5568;
+    --green: #34d399;
+    --green-bg: rgba(52,211,153,0.08);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.08);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251,191,36,0.08);
+    --blue: #60a5fa;
+    --blue-bg: rgba(96,165,250,0.08);
+    --accent: #818cf8;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', 'Noto Sans JP', sans-serif;
+    line-height: 1.7;
+    padding: 40px 24px 80px;
+  }
+
+  .container { max-width: 920px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .header-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header-meta {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* Section */
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section h2 .sec-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(129,140,248,0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Scorecard Grid */
+  .scorecard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .score-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .score-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .score-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .score-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(37,45,58,0.5);
+    vertical-align: top;
+  }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .ticker {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .company-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: block;
+  }
+  .beat { color: var(--green); }
+  .miss { color: var(--red); }
+  .inline { color: var(--amber); }
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+  .badge-beat { background: var(--green-bg); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-miss { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-inline { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-info { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+
+  /* Insight Cards */
+  .insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .insight-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .insight-card p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+  .insight-card .highlight {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Full-width card */
+  .card-full {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-full h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .card-full p, .card-full li {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.9;
+  }
+  .card-full li { margin-bottom: 4px; }
+
+  /* Stock bar */
+  .stock-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stock-bar-fill {
+    height: 6px;
+    border-radius: 3px;
+    min-width: 2px;
+  }
+  .stock-bar-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    min-width: 44px;
+    text-align: right;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .scorecard { grid-template-columns: repeat(2, 1fr); }
+    .insight-grid { grid-template-columns: 1fr; }
+    table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Header -->
+<div class="header">
+  <div class="header-eyebrow">Earnings Season Review</div>
+  <h1>2025Q4 決算シーズン総括</h1>
+  <div class="header-meta">8社 · 2026年3月2日〜3月12日 · by まっち &amp; Claude</div>
+</div>
+
+<!-- 1. Overview Scorecard -->
+<section>
+  <h2><span class="sec-num">01</span>シーズン概観</h2>
+  <div class="scorecard">
+    <div class="score-item">
+      <div class="score-label">処理銘柄</div>
+      <div class="score-value">8</div>
+      <div class="score-sub">社</div>
+    </div>
+    <div class="score-item">
+      <div class="score-label">EPS Beat率</div>
+      <div class="score-value" style="color:var(--green)">8/8</div>
+      <div class="score-sub">100%</div>
+    </div>
+    <div class="score-item">
+      <div class="score-label">Rev Beat率</div>
+      <div class="score-value" style="color:var(--green)">7/8</div>
+      <div class="score-sub">87.5%</div>
+    </div>
+    <div class="score-item">
+      <div class="score-label">株価反応 中央値</div>
+      <div class="score-value" style="color:var(--text-dim)">〜0%</div>
+      <div class="score-sub">Beat織込み済み</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Beat/Miss Matrix -->
+<section>
+  <h2><span class="sec-num">02</span>Beat/Miss 一覧</h2>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>決算期</th>
+        <th>EPS Beat%</th>
+        <th>Rev Beat%</th>
+        <th>Rev YoY</th>
+        <th>ガイダンス</th>
+        <th>株価</th>
+        <th>Sentiment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="ticker">AVGO</span><span class="company-sub">Broadcom</span></td>
+        <td class="mono">Q1 FY26</td>
+        <td class="mono beat">+2.5%</td>
+        <td class="mono beat">+1.3%</td>
+        <td class="mono">+29.5%</td>
+        <td><span class="badge badge-beat">大幅Beat</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:50px;background:var(--green)"></div>
+            <span class="stock-bar-val beat">+5.0%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-beat">Positive</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">ORCL</span><span class="company-sub">Oracle</span></td>
+        <td class="mono">Q3 FY26</td>
+        <td class="mono beat">+5.3%</td>
+        <td class="mono beat">+0.8%</td>
+        <td class="mono">+25.4%</td>
+        <td><span class="badge badge-beat">上方修正</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:100px;background:var(--green)"></div>
+            <span class="stock-bar-val beat">+10%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-beat">Positive</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">ADBE</span><span class="company-sub">Adobe</span></td>
+        <td class="mono">Q1 FY26</td>
+        <td class="mono beat">+3.2%</td>
+        <td class="mono beat">+1.9%</td>
+        <td class="mono">+12.0%</td>
+        <td><span class="badge badge-beat">Beat</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:8px;background:var(--red)"></div>
+            <span class="stock-bar-val miss">−0.8%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-beat">Positive</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">OKTA</span><span class="company-sub">Okta</span></td>
+        <td class="mono">Q4 FY26</td>
+        <td class="mono beat">+5.9%</td>
+        <td class="mono beat">+1.6%</td>
+        <td class="mono">+11.8%</td>
+        <td><span class="badge badge-inline">Q1 Miss</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:30px;background:var(--green)"></div>
+            <span class="stock-bar-val beat">+3.0%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-beat">Positive</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">CRWD</span><span class="company-sub">CrowdStrike</span></td>
+        <td class="mono">Q4 FY26</td>
+        <td class="mono beat">+1.8%</td>
+        <td class="mono beat">+0.4%</td>
+        <td class="mono">+21.7%</td>
+        <td><span class="badge badge-inline">In-line</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:2px;background:var(--text-dim)"></div>
+            <span class="stock-bar-val" style="color:var(--text-dim)">≈0%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-beat">Positive</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">IOT</span><span class="company-sub">Samsara</span></td>
+        <td class="mono">Q4 FY26</td>
+        <td class="mono beat">+28.6%</td>
+        <td class="mono beat">+2.2%</td>
+        <td class="mono">+24.7%</td>
+        <td><span class="badge badge-beat">Beat</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:30px;background:var(--green)"></div>
+            <span class="stock-bar-val beat">+3.0%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-beat">Positive</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">COST</span><span class="company-sub">Costco</span></td>
+        <td class="mono">Q2 FY26</td>
+        <td class="mono beat">+3.4%</td>
+        <td class="mono beat">+0.5%</td>
+        <td class="mono">+9.1%</td>
+        <td><span class="badge badge-info">非提供</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:20px;background:var(--red)"></div>
+            <span class="stock-bar-val miss">−2.0%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-inline">Mixed</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticker">NCLH</span><span class="company-sub">Norwegian Cruise</span></td>
+        <td class="mono">Q4 2025</td>
+        <td class="mono beat">+3.7%</td>
+        <td class="mono miss">−4.1%</td>
+        <td class="mono">+6.4%</td>
+        <td><span class="badge badge-miss">下方修正</span></td>
+        <td>
+          <div class="stock-bar">
+            <div class="stock-bar-fill" style="width:73px;background:var(--red)"></div>
+            <span class="stock-bar-val miss">−7.3%</span>
+          </div>
+        </td>
+        <td><span class="badge badge-miss">Negative</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 3. Key Themes -->
+<section>
+  <h2><span class="sec-num">03</span>シーズンの3大テーマ</h2>
+
+  <div class="card-full">
+    <h3>🔥 テーマ1 — AI投資がP&Lに実装され始めた</h3>
+    <p>
+      AVGOのAI Semi Revenue <span class="highlight">$8.4B（+106% YoY）</span>、ORCLのCloud IaaS <span class="highlight">+84% YoY</span>、IOTのARR <span class="highlight">+25% YoY</span> で$1.3B突破、ADBEのAI-first ARR <span class="highlight">3倍超</span>。「AI関連」が決算資料で抽象的なバズワードとして語られるフェーズを過ぎ、実際のRevenue・ARRの成長ドライバーとして数字に現れてきた。特にAVGOはバックログ$73B、2027年にAIチップだけで$100B超の見通しを語るなど、スケールが桁違い。
+    </p>
+  </div>
+
+  <div class="card-full">
+    <h3>📊 テーマ2 — EPS Beat率100%だが株価反応は冷静</h3>
+    <p>
+      8社全社がEPS Beatという異例のシーズンだったが、株価反応の中央値はほぼゼロ。ORCLの+10%とAVGOの+5%が例外で、残りはBeatしても横ばい〜小幅安。市場は「Beatして当然」という前提で動いており、<span class="highlight">ガイダンスの質（方向性と幅）が株価を決定</span>するパターンが鮮明。ガイダンスが下方修正だったNCLHは−7.3%と突出して売られた。
+    </p>
+  </div>
+
+  <div class="card-full">
+    <h3>👔 テーマ3 — 経営トップの交代が相次ぐ</h3>
+    <p>
+      NCLHは新CEO John Chidsey就任、ADBEはShantanu Narayen（在任18年）の退任発表。いずれも株価にはネガティブ寄りのインパクト。経営交代はガイダンスの不確実性を高めるため、数字がBeatしていても市場は割り引いて評価する傾向がある。ADBEはEPS・Revenue・ガイダンスすべてBeatなのに−0.8%で着地しており、CEO退任のノイズが効いていた。
+    </p>
+  </div>
+</section>
+
+<!-- 4. MVP/Worst -->
+<section>
+  <h2><span class="sec-num">04</span>Best &amp; Worst</h2>
+  <div class="insight-grid">
+    <div class="insight-card" style="border-color:rgba(52,211,153,0.3)">
+      <h3>🏆 Best: AVGO</h3>
+      <p>
+        Revenue +29.5% YoY、AI Semi +106%という圧倒的な成長に加え、Q2ガイダンスが<span class="highlight">コンセンサスを8.8%上回る$22B</span>。AI時代のインフラを握る構造的な強さが数字に現れた。株価も素直に+5%で反応。
+      </p>
+    </div>
+    <div class="insight-card" style="border-color:rgba(248,113,113,0.3)">
+      <h3>⚠️ Worst: NCLH</h3>
+      <p>
+        唯一のRevenue Miss（−4.1%）。カリブ海キャパ+40%増の商業戦略ミスアライメント、長期財務目標の撤回、ガイダンス大幅下方修正と三重苦。新CEO就任による立て直しが急務。<span class="highlight">株価−7.3%</span>は8社で最大の下落。
+      </p>
+    </div>
+    <div class="insight-card" style="border-color:rgba(96,165,250,0.3)">
+      <h3>🌟 注目: ORCL</h3>
+      <p>
+        15年以上ぶりの「20/20 Quarter」（organic Rev・Non-GAAP EPS共に+20%超）。Cloud IaaS +84%の加速、RPO $553B（前年4倍）、FY2027ガイダンス引き上げ。攻めの投資（CapEx $50B、$30B調達）との財務バランスがCFO視点で見応えあり。
+      </p>
+    </div>
+    <div class="insight-card" style="border-color:rgba(129,140,248,0.3)">
+      <h3>💡 隠れ好決算: IOT</h3>
+      <p>
+        EPS Beat率<span class="highlight">+28.6%</span>はシーズン最大。ARR $1.3B突破、Net New ARR $89Mで加速傾向。SaaS銘柄として着実に黒字化が進行中。IOT向けAI需要の恩恵が今後さらに拡大する可能性。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. SaaS Cohort -->
+<section>
+  <h2><span class="sec-num">05</span>SaaS 3社の比較（CRWD / OKTA / IOT）</h2>
+  <div class="card-full">
+    <table>
+      <thead>
+        <tr><th></th><th>CRWD</th><th>OKTA</th><th>IOT</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:var(--text-dim)">Rev YoY</td><td class="mono">+21.7%</td><td class="mono">+11.8%</td><td class="mono">+24.7%</td></tr>
+        <tr><td style="color:var(--text-dim)">ARR</td><td class="mono">$5.25B</td><td class="mono">$26.1B(RPO)</td><td class="mono">$1.3B</td></tr>
+        <tr><td style="color:var(--text-dim)">Non-GAAP Op Margin</td><td class="mono">25.0%</td><td class="mono">26.0%</td><td class="mono">14.0%</td></tr>
+        <tr><td style="color:var(--text-dim)">FCF Margin</td><td class="mono">28.8%</td><td class="mono">33.0%</td><td class="mono">22.0%</td></tr>
+        <tr><td style="color:var(--text-dim)">ガイダンスFY Rev</td><td class="mono">$5.90B<br><span style="color:var(--amber);font-size:11px">In-line</span></td><td class="mono">$3.18B<br><span style="color:var(--green);font-size:11px">Beat</span></td><td class="mono">$1.59B<br><span style="color:var(--green);font-size:11px">Beat</span></td></tr>
+        <tr><td style="color:var(--text-dim)">注目テーマ</td><td>SIEM統合、初GAAP黒字</td><td>AI Agent Security</td><td>IoT × AI</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:16px">
+      3社ともRule of 40超え。CRWDはNet New ARR $1B超で過去最高を更新。OKTAはGAAP黒字定着（FY NI $235M）。IOTは成長率トップだがマージンは改善途上。共通して<span class="highlight">AI関連の新機能がARR加速の触媒</span>になっている。
+    </p>
+  </div>
+</section>
+
+<!-- 6. Portfolio Implications -->
+<section>
+  <h2><span class="sec-num">06</span>ポートフォリオへの示唆</h2>
+  <div class="card-full">
+    <h3>保有銘柄との接点</h3>
+    <p>
+      SBI口座でIOTを保有。今回のQ4は文句なしの好決算で、ARRの成長加速とマージン改善が確認できた。引き続きホールドの根拠は十分。
+    </p>
+    <p style="margin-top:12px">
+      PLTRはポートフォリオ最大ポジション（約1,664万円）。今回の決算シーズンではカバー対象外だが、AI関連銘柄全般の好調さ（AVGO・ORCL・IOTのAI KPI加速）は、PLTR周辺のセンチメントにもプラス。
+    </p>
+    <p style="margin-top:12px">
+      ORCL（非保有）の急成長は注目に値する。Cloud IaaS +84%、RPO $553Bという数字は、ハイパースケーラー以外でのAIインフラ需要の広がりを示唆。ただし$30B調達とCapEx $50BでFCFが大幅マイナスという財務面のリスクも。
+    </p>
+  </div>
+
+  <div class="card-full">
+    <h3>マクロ所感</h3>
+    <p>
+      今シーズンの全体感は「<span class="highlight">AI投資の恩恵がトップラインに出始めた一方、市場はさらなるガイダンス上方修正を求めている</span>」。Beat自体はもはや最低条件で、次のQのガイダンスとストーリーの質が株価を動かすフェーズ。NCLHのようにガイダンスを下方修正した銘柄は容赦なく売られる。
+    </p>
+    <p style="margin-top:12px">
+      金利環境（US 10Y 4.0〜4.1%）が安定している中で、成長株のバリュエーションは依然として金利感応度が高い。ADBEのように数字がすべてBeatでもCEO交代のような定性リスクで株価が下がる環境は、ファンダメンタルズだけでなくナラティブの管理も重要であることを示している。
+    </p>
+  </div>
+</section>
+
+<!-- 7. Watchlist -->
+<section>
+  <h2><span class="sec-num">07</span>買い候補ウォッチリスト</h2>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:24px">
+    決算品質スコア（quality_score）順。Extreme Fear局面で「この水準以下なら検討」の目安を添付。<br>
+    <span style="color:var(--amber)">※ バリュエーション列（fwd_pe, ev_revenue, fcf_yield）は次シーズンから正式運用。今回は参考値。</span>
+  </p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Ticker</th>
+        <th style="text-align:center">Quality</th>
+        <th>根拠</th>
+        <th>注意点</th>
+        <th>Fear時の着眼点</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mono">1</td>
+        <td><span class="ticker">AVGO</span></td>
+        <td style="text-align:center"><span class="badge badge-beat" style="font-size:14px;padding:4px 10px">5</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS・Rev Beat + Q2ガイダンス大幅Beat（+8.8%）+ AI Semi +106% YoY + 成長加速</td>
+        <td style="font-size:12px;color:var(--text-dim)">AI顧客5社への集中リスク、TSMCへの製造依存</td>
+        <td style="font-size:12px">Forward P/Eが25x以下に沈んだら注目。AI backlog $73Bが下支え</td>
+      </tr>
+      <tr>
+        <td class="mono">2</td>
+        <td><span class="ticker">ORCL</span></td>
+        <td style="text-align:center"><span class="badge badge-beat" style="font-size:14px;padding:4px 10px">5</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">20/20 Quarter + IaaS +84% + FY2027 Rev $90Bに引き上げ + RPO $553B</td>
+        <td style="font-size:12px;color:var(--text-dim)">CapEx $50BでFCF大幅マイナス、$30B調達による財務負荷</td>
+        <td style="font-size:12px">FCF正常化の兆候が見えたタイミング × 株価急落が重なれば妙味。RPOの長さが安全マージン</td>
+      </tr>
+      <tr>
+        <td class="mono">3</td>
+        <td><span class="ticker">IOT</span></td>
+        <td style="text-align:center"><span class="badge badge-beat" style="font-size:14px;padding:4px 10px">4</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS Beat +28.6%（最大）+ Rev Beat + ARR加速 + ガイダンスBeat</td>
+        <td style="font-size:12px;color:var(--text-dim)">Op Margin 14%とまだ改善途上、SaaS銘柄の中では規模小</td>
+        <td style="font-size:12px">EV/Revenue 15x以下で検討。ARR成長率25%維持 × マージン改善がキー</td>
+      </tr>
+      <tr>
+        <td class="mono">4</td>
+        <td><span class="ticker">ADBE</span></td>
+        <td style="text-align:center"><span class="badge badge-beat" style="font-size:14px;padding:4px 10px">4</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS・Rev・ガイダンス全Beat + AI-first ARR 3倍超 + Record Q1 CF</td>
+        <td style="font-size:12px;color:var(--text-dim)">CEO退任の不確実性（−0.5）、Equity減少トレンド</td>
+        <td style="font-size:12px">後任CEO確定でリスク消化 × Forward P/E 20x台前半なら割安圏。FCF Yield 5%超が目安</td>
+      </tr>
+      <tr>
+        <td class="mono">5</td>
+        <td><span class="ticker">CRWD</span></td>
+        <td style="text-align:center"><span class="badge badge-beat" style="font-size:14px;padding:4px 10px">4</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS・Rev Beat + Net New ARR $1B超 + 初GAAP黒字 + ARR $5B突破</td>
+        <td style="font-size:12px;color:var(--text-dim)">ガイダンスIn-line止まり（+0なし）、2024年7月の障害の記憶</td>
+        <td style="font-size:12px">FCF Margin 30%の安定キャッシュマシン。EV/Revenue 15x以下で注目</td>
+      </tr>
+      <tr>
+        <td class="mono">6</td>
+        <td><span class="ticker">OKTA</span></td>
+        <td style="text-align:center"><span class="badge badge-inline" style="font-size:14px;padding:4px 10px">3</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS・Rev Beat + FY通期Beat、ただしQ1ガイダンスMiss（−0.5）</td>
+        <td style="font-size:12px;color:var(--text-dim)">成長率+12%で減速傾向、AI Agent Securityの収益化は未知数</td>
+        <td style="font-size:12px">FCF Margin 27-28%は堅実。Forward P/E 20x以下でバリュー領域</td>
+      </tr>
+      <tr>
+        <td class="mono">7</td>
+        <td><span class="ticker">COST</span></td>
+        <td style="text-align:center"><span class="badge badge-inline" style="font-size:14px;padding:4px 10px">3</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS・Rev Beat、安定成長 +9.1%</td>
+        <td style="font-size:12px;color:var(--text-dim)">ガイダンス非提供、常に高バリュエーション</td>
+        <td style="font-size:12px">COSTが安くなるのはマクロショック時のみ。Forward P/E 35x以下は稀少な買い場</td>
+      </tr>
+      <tr>
+        <td class="mono">8</td>
+        <td><span class="ticker">NCLH</span></td>
+        <td style="text-align:center"><span class="badge badge-miss" style="font-size:14px;padding:4px 10px">2</span></td>
+        <td style="font-size:12px;color:var(--text-dim)">EPS Beat だが Rev Miss + ガイダンス大幅下方修正 + 長期目標撤回</td>
+        <td style="font-size:12px;color:var(--text-dim)">Net Leverage 5.3x、カリブ海キャパ問題、新CEO実績未知</td>
+        <td style="font-size:12px">ターンアラウンド銘柄。新CEOの実行力が見えるまでは様子見が無難</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="card-full" style="margin-top:24px;border-color:rgba(129,140,248,0.3)">
+    <h3 style="color:var(--accent)">📋 Extreme Fear 時のアクションプラン</h3>
+    <p>
+      ① Fear & Greed Index が Extreme Fear（≤20）に入ったら、このリストを開く<br>
+      ② quality_score 4以上の銘柄（AVGO, ORCL, IOT, ADBE, CRWD）のForward P/Eを確認<br>
+      ③ 決算時点のForward P/Eから20%以上低下していれば「不当に安い」ゾーン<br>
+      ④ FCF Yield 5%超なら買い検討、ポジションサイズはポートフォリオ全体の5%以内を目安<br>
+      ⑤ 買った理由と水準を記録（次回決算で振り返り）
+    </p>
+  </div>
+</section>
+
+<footer>
+  2025Q4 Earnings Season Review v2 — 2026-03-13 作成<br>
+  <span style="font-family:'JetBrains Mono',monospace">Maintained by まっち &amp; Claude</span>
+</footer>
+
+</div>
+</body>
+</html>

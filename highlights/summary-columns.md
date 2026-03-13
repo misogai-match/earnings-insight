@@ -1,4 +1,4 @@
-# summary-2025Q4.csv カラム定義
+# summary CSV カラム定義（v2 — 2026-03-13 更新）
 
 ## 識別情報
 | カラム | 型 | 説明 | 例 |
@@ -51,6 +51,40 @@
 |--------|-----|------|--------|
 | net_leverage | text | Net Debt / EBITDA | 5.3x |
 
+## バリュエーション（v2 追加）
+| カラム | 型 | 説明 | 抽出例 |
+|--------|-----|------|--------|
+| fwd_pe | float | 決算発表時点のForward P/E（NTM EPS基準） | 22.5 |
+| ev_revenue | float | EV/Revenue（直近Q annualized、SaaS・高成長向け） | 12.3 |
+| fcf_yield_pct | float | FCF Yield = Annualized FCF ÷ 時価総額 ×100（%） | 4.2 |
+
+## 決算品質スコア（v2 追加）
+| カラム | 型 | 説明 | 抽出例 |
+|--------|-----|------|--------|
+| quality_score | int | 決算品質の総合評価（1〜5） | 4 |
+
+### quality_score 基準
+
+| スコア | 判定 | 条件の目安 |
+|--------|------|-----------|
+| 5 | 文句なし | EPS & Rev 両方Beat + ガイダンス上方修正 + 成長加速 |
+| 4 | 好決算 | EPS & Rev 両方Beat + ガイダンスBeat or In-line |
+| 3 | 及第点 | EPS Beat + Rev ≈ In-line、ガイダンス据置 |
+| 2 | やや弱い | EPS Beat だが Rev Miss、またはガイダンス下方修正 |
+| 1 | 悪い | EPS & Rev Miss、またはガイダンス大幅下方修正 |
+
+### 補正要素（±0.5 → 四捨五入）
+- 成長率加速（前Q比でRev YoY上昇）: +0.5
+- マージン改善 +200bps以上: +0.5
+- FCF Margin 30%超: +0.5
+- CEO交代・会計変更等の不確実性: −0.5
+- Revenue Miss: −0.5
+
+### 運用ルール
+- スコアリングは決算処理完了後にClaudeが提案 → まっちさんが承認
+- 主観が入るため、最終判断はまっちさん
+- 同一銘柄のスコア推移も重要（改善傾向 / 悪化傾向）
+
 ## 定性タグ・評価
 | カラム | 型 | 説明 | 抽出例 |
 |--------|-----|------|--------|
@@ -64,6 +98,12 @@
 ## 想定クエリ例
 
 ```
+# 良い決算 × 割安を探す（Extreme Fear時の買い候補フィルタ）
+quality_score >= 4 AND fwd_pe < 業種平均
+
+# FCF Yieldが高い好決算銘柄
+quality_score >= 4 ORDER BY fcf_yield_pct DESC
+
 # EPS & Revenue 両方Beatの銘柄
 eps_beat_pct > 0 AND revenue_beat_pct > 0
 
@@ -78,4 +118,15 @@ tags CONTAINS "CEO交代"
 
 # 株価反応が良かった順
 ORDER BY stock_reaction_pct DESC
+
+# 決算品質スコアが高い順（買い候補の優先順位付け）
+ORDER BY quality_score DESC, fcf_yield_pct DESC
 ```
+
+---
+
+## 変更履歴
+| 日付 | 変更内容 |
+|------|----------|
+| 2026-03-06 | v1 初版作成（26カラム） |
+| 2026-03-13 | v2 バリュエーション3列 + quality_score 追加（30カラム） |
